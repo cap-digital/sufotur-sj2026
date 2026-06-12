@@ -1,0 +1,148 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { fetchRows } from "./lib/data";
+import { Row } from "./lib/types";
+import { NAV, Sidebar } from "./components/Sidebar";
+import { Landing } from "./views/Landing";
+import { Overview } from "./views/Overview";
+import { PlatformView } from "./views/PlatformView";
+import { YoutubeView } from "./views/YoutubeView";
+import { KwaiView } from "./views/KwaiView";
+import { Creatives } from "./views/Creatives";
+import { Goals } from "./views/Goals";
+
+const VALID = ["overview", "meta", "youtube", "kwai", "criativos", "metas"];
+
+function parseHash(): string {
+  if (typeof window === "undefined") return "";
+  const h = window.location.hash.replace(/^#\/?/, "");
+  return VALID.includes(h) ? h : h === "" ? "" : "overview";
+}
+
+export default function App() {
+  const [route, setRoute] = useState<string>("");
+  const [mounted, setMounted] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [rows, setRows] = useState<Row[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    setRoute(parseHash());
+    const onHash = () => setRoute(parseHash());
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  // carregamento dos dados (uma vez)
+  useEffect(() => {
+    let active = true;
+    fetchRows()
+      .then((r) => active && setRows(r))
+      .catch((e) => active && setError(e.message ?? "Erro ao carregar dados"));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  function navigate(r: string) {
+    window.location.hash = `/${r}`;
+    setRoute(r);
+    window.scrollTo({ top: 0 });
+  }
+
+  if (!mounted) return null;
+
+  // Landing
+  if (route === "") {
+    return <Landing onEnter={() => navigate("overview")} />;
+  }
+
+  const current = NAV.find((n) => n.route === route);
+
+  return (
+    <div className="min-h-[100dvh] bg-[var(--bg)]">
+      <Sidebar
+        route={route}
+        navigate={navigate}
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        collapsed={collapsed}
+        onToggleCollapse={() => setCollapsed((c) => !c)}
+      />
+
+      <div className={`transition-all duration-200 ${collapsed ? "lg:pl-24" : "lg:pl-[264px]"}`}>
+        {/* topbar */}
+        <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-[var(--border)] bg-white/90 px-4 py-3 backdrop-blur sm:px-6">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="rounded-lg border border-[var(--border)] p-2 text-[var(--ink)] lg:hidden"
+            aria-label="Abrir menu"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+          </button>
+          <div className="flex-1">
+            <p className="text-[11px] uppercase tracking-wide text-[var(--muted)]">São João 2026 · SUFOTUR</p>
+            <h1 className="text-sm font-bold text-[var(--ink)] sm:text-base">{current?.label ?? "Dashboard"}</h1>
+          </div>
+          <button
+            onClick={() => navigate("")}
+            className="hidden rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-semibold text-[var(--muted)] hover:bg-gray-50 sm:block"
+          >
+            Início
+          </button>
+        </header>
+
+        <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-7">
+          {error && (
+            <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              Não foi possível carregar os dados: {error}
+            </div>
+          )}
+          {!error && rows === null && <Loading />}
+          {!error && rows && <Page route={route} rows={rows} />}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function Page({ route, rows }: { route: string; rows: Row[] }) {
+  switch (route) {
+    case "overview":
+      return <Overview rows={rows} />;
+    case "meta":
+      return <PlatformView rows={rows} platform="Meta" />;
+    case "youtube":
+      return <YoutubeView rows={rows} />;
+    case "kwai":
+      return <KwaiView rows={rows} />;
+    case "criativos":
+      return <Creatives rows={rows} />;
+    case "metas":
+      return <Goals rows={rows} />;
+    default:
+      return <Overview rows={rows} />;
+  }
+}
+
+function Loading() {
+  return (
+    <div className="space-y-4">
+      <div className="h-8 w-48 animate-pulse rounded-lg bg-gray-200" />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-24 animate-pulse rounded-xl bg-gray-200" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="h-72 animate-pulse rounded-xl bg-gray-200" />
+        <div className="h-72 animate-pulse rounded-xl bg-gray-200" />
+      </div>
+    </div>
+  );
+}
