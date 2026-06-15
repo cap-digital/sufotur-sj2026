@@ -85,7 +85,7 @@ export function Creatives({ rows }: { rows: Row[] }) {
       <div className="max-w-[220px]"><p className="truncate font-medium">{r.criativo}</p><p className="text-xs text-[var(--muted)]">{r.estrategia}</p></div>
     ) },
     { key: "plat", header: "Plataforma", sortValue: (r) => r.plataforma, render: (r) => (
-      <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: PLATFORM_COLORS[r.plataforma] }} />{r.plataforma === "Youtube" ? "YouTube" : r.plataforma}</span>
+      <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: PLATFORM_COLORS[r.plataforma] }} />{r.plataforma}</span>
     ) },
     { key: "inv", header: "Investimento", align: "right", sortValue: (r) => r.totals.investimento, render: (r) => dash(r.totals.investimento, formatCurrency) },
     { key: "imp", header: "Impressões", align: "right", sortValue: (r) => r.totals.impressoes, render: (r) => dash(r.totals.impressoes, formatInt) },
@@ -109,7 +109,6 @@ export function Creatives({ rows }: { rows: Row[] }) {
             options={[
               { label: "Todas", value: "all", color: "#1a1d21" },
               { label: "Meta", value: "Meta", color: "#3FA9C9" },
-              { label: "YouTube", value: "Youtube", color: "#E12B2B" },
               { label: "Kwai", value: "Kwai", color: "#E8862B" },
             ]}
           />
@@ -210,7 +209,7 @@ function Thumb({ url, platform, formatos, color, name }: { url: string; platform
           <span className="line-clamp-2 text-xs text-white/60">{name}</span>
         </div>
       )}
-      <span className="absolute left-2 top-2 rounded-md px-2 py-0.5 text-[11px] font-bold text-white shadow" style={{ background: color }}>{platform === "Youtube" ? "YouTube" : platform}</span>
+      <span className="absolute left-2 top-2 rounded-md px-2 py-0.5 text-[11px] font-bold text-white shadow" style={{ background: color }}>{platform}</span>
       <span className="absolute right-2 top-2 rounded-full bg-black/75 px-2.5 py-0.5 text-[11px] font-semibold text-white">{formatos} formato{formatos > 1 ? "s" : ""}</span>
     </div>
   );
@@ -235,7 +234,7 @@ function PlatTag({ p }: { p: Platform }) {
   return (
     <span className="ml-1.5 inline-flex items-center gap-1 align-middle text-[11px] font-semibold" style={{ color: PLATFORM_COLORS[p] }}>
       <span className="h-1.5 w-1.5 rounded-full" style={{ background: PLATFORM_COLORS[p] }} />
-      {p === "Youtube" ? "YouTube" : p}
+      {p}
     </span>
   );
 }

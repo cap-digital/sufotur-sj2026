@@ -1,4 +1,4 @@
-export type Platform = "Meta" | "Youtube" | "Kwai";
+export type Platform = "Meta" | "Kwai";
 
 export interface Row {
   data: string; // ISO date
@@ -51,7 +51,6 @@ export const METRICS: MetricDef[] = [
 
 export const PLATFORM_COLORS: Record<Platform, string> = {
   Meta: "#3FA9C9", // azul/teal Bahia
-  Youtube: "#E12B2B", // vermelho Bahia
   Kwai: "#E8862B", // laranja Bahia
 };
 

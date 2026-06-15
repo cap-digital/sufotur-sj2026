@@ -4,7 +4,7 @@ import { toNumber } from "./format";
 const ENDPOINT = "https://cqrpbiepyeypbkizwacu.supabase.co/functions/v1/SufoturSJ2026";
 const KEY = "sb_publishable_YN9YKLw6sludrgf9T2i_1g_Dcm8dIiK";
 
-const VALID_PLATFORMS: Platform[] = ["Meta", "Youtube", "Kwai"];
+const VALID_PLATFORMS: Platform[] = ["Meta", "Kwai"];
 
 interface RawRow {
   [k: string]: string | number;
@@ -249,12 +249,9 @@ export function derived(t: Totals): Derived {
 
 // ---------- Resolução de thumbnails ----------
 
-/** Converte URLs (fbcdn, youtube, drive) em uma imagem exibível */
+/** Converte URLs (fbcdn, drive) em uma imagem exibível */
 export function resolveThumb(url: string): string | null {
   if (!url) return null;
-  // YouTube
-  const yt = url.match(/(?:youtu\.be\/|shorts\/|live\/|embed\/|v=)([\w-]{6,})/);
-  if (yt) return `https://img.youtube.com/vi/${yt[1]}/hqdefault.jpg`;
   // Google Drive
   const drive = url.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
   if (drive) return `https://drive.google.com/thumbnail?id=${drive[1]}&sz=w600`;

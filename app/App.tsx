@@ -7,12 +7,11 @@ import { Sidebar } from "./components/Sidebar";
 import { Landing } from "./views/Landing";
 import { Overview } from "./views/Overview";
 import { PlatformView } from "./views/PlatformView";
-import { YoutubeView } from "./views/YoutubeView";
 import { KwaiView } from "./views/KwaiView";
 import { Creatives } from "./views/Creatives";
 import { Goals } from "./views/Goals";
 
-const VALID = ["overview", "meta", "youtube", "kwai", "criativos", "metas"];
+const VALID = ["overview", "meta", "kwai", "criativos", "metas"];
 
 function parseHash(): string {
   if (typeof window === "undefined") return "";
@@ -113,8 +112,6 @@ function Page({ route, rows }: { route: string; rows: Row[] }) {
       return <Overview rows={rows} />;
     case "meta":
       return <PlatformView rows={rows} platform="Meta" />;
-    case "youtube":
-      return <YoutubeView rows={rows} />;
     case "kwai":
       return <KwaiView rows={rows} />;
     case "criativos":

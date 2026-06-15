@@ -101,7 +101,6 @@ export function FilterBar({
             options={[
               { label: "Todas", value: "all", color: "#1a1d21" },
               { label: "Meta", value: "Meta", color: "#3FA9C9" },
-              { label: "YouTube", value: "Youtube", color: "#E12B2B" },
               { label: "Kwai", value: "Kwai", color: "#E8862B" },
             ]}
           />

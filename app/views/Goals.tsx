@@ -129,7 +129,6 @@ export function Goals({ rows }: { rows: Row[] }) {
             options={[
               { label: "Todas", value: "all", color: "#1a1d21" },
               { label: "Meta", value: "Meta", color: "#3FA9C9" },
-              { label: "YouTube", value: "Youtube", color: "#E12B2B" },
               { label: "Kwai", value: "Kwai", color: "#E8862B" },
             ]}
           />
@@ -178,7 +177,7 @@ export function Goals({ rows }: { rows: Row[] }) {
             value={projGoalKey}
             onChange={setProjGoalKey}
             options={GOALS.map((g) => ({
-              label: `${g.plataforma === "Youtube" ? "YouTube" : g.plataforma} · ${g.estrategia}`,
+              label: `${g.plataforma} · ${g.estrategia}`,
               value: `${g.plataforma}|${g.estrategia}`,
               color: PLATFORM_COLORS[g.plataforma],
             }))}
@@ -195,7 +194,7 @@ export function Goals({ rows }: { rows: Row[] }) {
               height={340}
             />
             <p className="mt-2 text-xs text-[var(--muted)]">
-              A linha contínua mostra o realizado acumulado de <strong>{selectedGoal.plataforma === "Youtube" ? "YouTube" : selectedGoal.plataforma} · {selectedGoal.estrategia}</strong>; a tracejada projeta o ritmo atual. O investimento é travado em 100%.
+              A linha contínua mostra o realizado acumulado de <strong>{selectedGoal.plataforma} · {selectedGoal.estrategia}</strong>; a tracejada projeta o ritmo atual. O investimento é travado em 100%.
             </p>
           </>
         ) : (
@@ -225,7 +224,7 @@ function GoalCard({
         <div>
           <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide" style={{ color }}>
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: color }} />
-            {c.g.plataforma === "Youtube" ? "YouTube" : c.g.plataforma}
+            {c.g.plataforma}
           </span>
           <h3 className="text-base font-bold text-[var(--ink)]">{c.g.estrategia}</h3>
         </div>

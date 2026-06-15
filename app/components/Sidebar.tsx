@@ -12,7 +12,6 @@ export interface NavItem {
 export const NAV: NavItem[] = [
   { route: "overview", label: "Visão Geral", icon: <IconGrid />, color: "#3FA9C9" },
   { route: "meta", label: "Meta", icon: <IconDot />, color: "#3FA9C9" },
-  { route: "youtube", label: "YouTube", icon: <IconDot />, color: "#E12B2B" },
   { route: "kwai", label: "Kwai", icon: <IconDot />, color: "#E8862B" },
   { route: "criativos", label: "Criativos", icon: <IconImage />, color: "#E6308A" },
   { route: "metas", label: "Metas", icon: <IconTarget />, color: "#8BC53F" },

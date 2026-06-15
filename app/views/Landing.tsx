@@ -43,7 +43,6 @@ export function Landing({ onEnter }: { onEnter: () => void }) {
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs text-white/50">
           <span className="rounded-md bg-white/5 px-3 py-1">Meta</span>
-          <span className="rounded-md bg-white/5 px-3 py-1">YouTube</span>
           <span className="rounded-md bg-white/5 px-3 py-1">Kwai</span>
         </div>
 

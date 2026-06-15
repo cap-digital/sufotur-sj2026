@@ -35,30 +35,6 @@ export const GOALS: Goal[] = [
     metricLabel: "Impressões",
     metricGoal: 3750000,
   },
-  {
-    plataforma: "Youtube",
-    estrategia: "Alcance",
-    investimento: 95000,
-    metricKey: "impressoes",
-    metricLabel: "Impressões",
-    metricGoal: 3800000,
-  },
-  {
-    plataforma: "Youtube",
-    estrategia: "Visualização Shorts",
-    investimento: 85000,
-    metricKey: "visualizacoes",
-    metricLabel: "Visualizações",
-    metricGoal: 531250,
-  },
-  {
-    plataforma: "Youtube",
-    estrategia: "Visualização In Stream",
-    investimento: 70000,
-    metricKey: "visualizacoes",
-    metricLabel: "Visualizações",
-    metricGoal: 466667,
-  },
 ];
 
 export const TOTAL_INVESTMENT_GOAL = GOALS.reduce((s, g) => s + g.investimento, 0);
