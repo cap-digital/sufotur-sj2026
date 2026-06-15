@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { fetchRows } from "./lib/data";
+import { fetchData } from "./lib/data";
 import { Row } from "./lib/types";
-import { NAV, Sidebar } from "./components/Sidebar";
+import { Sidebar } from "./components/Sidebar";
 import { Landing } from "./views/Landing";
 import { Overview } from "./views/Overview";
 import { PlatformView } from "./views/PlatformView";
@@ -26,6 +26,7 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [updatedAt, setUpdatedAt] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,8 +40,12 @@ export default function App() {
   // carregamento dos dados (uma vez)
   useEffect(() => {
     let active = true;
-    fetchRows()
-      .then((r) => active && setRows(r))
+    fetchData()
+      .then((d) => {
+        if (!active) return;
+        setRows(d.rows);
+        setUpdatedAt(d.timestamp);
+      })
       .catch((e) => active && setError(e.message ?? "Erro ao carregar dados"));
     return () => {
       active = false;
@@ -60,8 +65,6 @@ export default function App() {
     return <Landing onEnter={() => navigate("overview")} />;
   }
 
-  const current = NAV.find((n) => n.route === route);
-
   return (
     <div className="min-h-[100dvh] bg-[var(--bg)]">
       <Sidebar
@@ -71,40 +74,33 @@ export default function App() {
         onClose={() => setSidebarOpen(false)}
         collapsed={collapsed}
         onToggleCollapse={() => setCollapsed((c) => !c)}
+        updatedAt={updatedAt}
       />
 
       <div className={`transition-all duration-200 ${collapsed ? "lg:pl-24" : "lg:pl-[264px]"}`}>
-        {/* topbar */}
-        <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-[var(--border)] bg-white/90 px-4 py-3 backdrop-blur sm:px-6">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="rounded-lg border border-[var(--border)] p-2 text-[var(--ink)] lg:hidden"
-            aria-label="Abrir menu"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 6h18M3 12h18M3 18h18" />
-            </svg>
-          </button>
-          <div className="flex-1">
-            <p className="text-[11px] uppercase tracking-wide text-[var(--muted)]">São João 2026 · SUFOTUR</p>
-            <h1 className="text-sm font-bold text-[var(--ink)] sm:text-base">{current?.label ?? "Dashboard"}</h1>
-          </div>
-          <button
-            onClick={() => navigate("")}
-            className="hidden rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-semibold text-[var(--muted)] hover:bg-gray-50 sm:block"
-          >
-            Início
-          </button>
-        </header>
+        {/* botão de menu flutuante (mobile) */}
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="fixed left-4 top-4 z-30 rounded-lg border border-[var(--border)] bg-white p-2 text-[var(--ink)] shadow-md lg:hidden"
+          aria-label="Abrir menu"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 6h18M3 12h18M3 18h18" />
+          </svg>
+        </button>
 
-        <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-7">
+        <main className="mx-auto max-w-7xl px-4 py-5 pt-16 sm:px-6 sm:py-7 lg:pt-7">
           {error && (
             <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
               Não foi possível carregar os dados: {error}
             </div>
           )}
           {!error && rows === null && <Loading />}
-          {!error && rows && <Page route={route} rows={rows} />}
+          {!error && rows && (
+            <div key={route} className="fade-in">
+              <Page route={route} rows={rows} />
+            </div>
+          )}
         </main>
       </div>
     </div>

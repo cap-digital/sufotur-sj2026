@@ -112,7 +112,7 @@ export function Goals({ rows }: { rows: Row[] }) {
 
   return (
     <div>
-      <SectionTitle sub="Acompanhamento das metas contratadas por plataforma e estratégia">
+      <SectionTitle sub="Acompanhamento das metas contratadas por plataforma e estratégia" accent="#8BC53F">
         Metas
       </SectionTitle>
 

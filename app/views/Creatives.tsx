@@ -97,7 +97,7 @@ export function Creatives({ rows }: { rows: Row[] }) {
 
   return (
     <div>
-      <SectionTitle sub="Desempenho por peça criativa — imagens, formatos e métricas">Criativos</SectionTitle>
+      <SectionTitle sub="Desempenho por peça criativa — imagens, formatos e métricas" accent="#E6308A">Criativos</SectionTitle>
 
       {/* filtros */}
       <div className="mb-5 flex flex-col gap-3 rounded-xl border border-[var(--border)] bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">

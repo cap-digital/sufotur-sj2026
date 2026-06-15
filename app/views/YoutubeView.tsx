@@ -89,7 +89,7 @@ export function YoutubeView({ rows }: { rows: Row[] }) {
 
   return (
     <div>
-      <SectionTitle sub="Análise comparativa das estratégias — YouTube">
+      <SectionTitle sub="Análise comparativa das estratégias — YouTube" accent={YT}>
         <span className="inline-flex items-center gap-2"><span className="h-3 w-3 rounded-full" style={{ background: YT }} />YouTube</span>
       </SectionTitle>
 

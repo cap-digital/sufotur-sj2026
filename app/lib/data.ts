@@ -57,7 +57,7 @@ function normGender(g: string): string {
   return g;
 }
 
-export async function fetchRows(): Promise<Row[]> {
+export async function fetchData(): Promise<{ rows: Row[]; timestamp: string }> {
   const res = await fetch(ENDPOINT, {
     method: "POST",
     headers: {
@@ -70,7 +70,14 @@ export async function fetchRows(): Promise<Row[]> {
   if (!res.ok) throw new Error(`Erro ${res.status} ao carregar dados`);
   const json = await res.json();
   const list: RawRow[] = json.consolidado ?? [];
-  return list.map(normalize).filter((r): r is Row => r !== null);
+  return {
+    rows: list.map(normalize).filter((r): r is Row => r !== null),
+    timestamp: typeof json.timestamp === "string" ? json.timestamp : "",
+  };
+}
+
+export async function fetchRows(): Promise<Row[]> {
+  return (await fetchData()).rows;
 }
 
 // ---------- Agregações ----------

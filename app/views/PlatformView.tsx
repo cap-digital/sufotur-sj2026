@@ -121,7 +121,7 @@ export function PlatformView({ rows, platform }: { rows: Row[]; platform: Platfo
 
   return (
     <div>
-      <SectionTitle sub="Performance detalhada — Meta">
+      <SectionTitle sub="Performance detalhada — Meta" accent={color}>
         <span className="inline-flex items-center gap-2"><span className="h-3 w-3 rounded-full" style={{ background: color }} />Meta</span>
       </SectionTitle>
 

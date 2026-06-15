@@ -36,8 +36,26 @@ body {
   background: transparent;
 }
 
+::selection {
+  background: rgba(63, 169, 201, 0.18);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  .fade-in {
+    animation: fadeIn 0.25s ease-out;
   }
 }

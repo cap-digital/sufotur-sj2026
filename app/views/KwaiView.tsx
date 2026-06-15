@@ -6,7 +6,7 @@ import { Row } from "../lib/types";
 import { formatCurrency, formatDecimal, formatInt, formatNumber, formatPercent } from "../lib/format";
 import { applyFilters, DEFAULT_FILTERS, FilterBar, FilterState } from "../components/Filters";
 import { BarDatum, DonutChart, FunnelChart, HorizontalBars, TimeSeries, VerticalBars } from "../components/charts";
-import { AnalysisBox, Card, EmptyState, Insight, SectionTitle, StatCard } from "../components/ui";
+import { AnalysisBox, Card, EmptyState, Insight, SectionTitle, Select, StatCard } from "../components/ui";
 import { Column, DataTable } from "../components/DataTable";
 
 const KW = "#E8862B";
@@ -25,8 +25,16 @@ function dash(v: number, f: (n: number) => string) {
   return v ? f(v) : "-";
 }
 
+type AgeMetric = "impressoes" | "cliques" | "visualizacoes";
+const AGE_METRICS: { key: AgeMetric; label: string }[] = [
+  { key: "impressoes", label: "Impressões" },
+  { key: "cliques", label: "Cliques" },
+  { key: "visualizacoes", label: "Visualizações" },
+];
+
 export function KwaiView({ rows }: { rows: Row[] }) {
   const [filters, setFilters] = useState<FilterState>({ ...DEFAULT_FILTERS, plataforma: "Kwai" });
+  const [ageMetric, setAgeMetric] = useState<AgeMetric>("impressoes");
 
   const kwRows = useMemo(() => rows.filter((r) => r.plataforma === "Kwai"), [rows]);
   const bounds = useMemo(() => dateBounds(kwRows) ?? undefined, [kwRows]);
@@ -56,8 +64,8 @@ export function KwaiView({ rows }: { rows: Row[] }) {
   // faixa etária
   const byAge: BarDatum[] = useMemo(() => {
     const ages = Array.from(new Set(data.map((r) => r.idade).filter((a) => a && a !== "N/D"))).sort((a, b) => ageOrder(a) - ageOrder(b));
-    return ages.map((a) => ({ name: a, value: sumRows(data.filter((r) => r.idade === a)).impressoes })).filter((x) => x.value > 0);
-  }, [data]);
+    return ages.map((a) => ({ name: a, value: sumRows(data.filter((r) => r.idade === a))[ageMetric] })).filter((x) => x.value > 0);
+  }, [data, ageMetric]);
 
   // criativos
   const creativeRows = useMemo(
@@ -91,7 +99,7 @@ export function KwaiView({ rows }: { rows: Row[] }) {
 
   return (
     <div>
-      <SectionTitle sub="Performance detalhada — Kwai">
+      <SectionTitle sub="Performance detalhada — Kwai" accent={KW}>
         <span className="inline-flex items-center gap-2"><span className="h-3 w-3 rounded-full" style={{ background: KW }} />Kwai</span>
       </SectionTitle>
 
@@ -148,7 +156,12 @@ export function KwaiView({ rows }: { rows: Row[] }) {
 
           {/* Linha 4 — faixa etária (único recorte demográfico em destaque) */}
           {byAge.length > 0 && (
-            <Card title="Público por faixa etária" subtitle="Impressões por idade" className="mt-4">
+            <Card
+              title="Público por faixa etária"
+              subtitle="Selecione a métrica"
+              className="mt-4"
+              action={<Select value={ageMetric} onChange={(v) => setAgeMetric(v as AgeMetric)} options={AGE_METRICS.map((m) => ({ label: m.label, value: m.key }))} />}
+            >
               <VerticalBars data={byAge} kind="compact" color={KW} />
             </Card>
           )}

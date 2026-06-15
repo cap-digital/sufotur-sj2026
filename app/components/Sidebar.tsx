@@ -25,6 +25,7 @@ export function Sidebar({
   onClose,
   collapsed,
   onToggleCollapse,
+  updatedAt,
 }: {
   route: string;
   navigate: (r: string) => void;
@@ -32,6 +33,7 @@ export function Sidebar({
   onClose: () => void;
   collapsed: boolean;
   onToggleCollapse: () => void;
+  updatedAt?: string;
 }) {
   return (
     <>
@@ -55,8 +57,15 @@ export function Sidebar({
           </svg>
         </button>
 
-        {/* header */}
-        <div className={`flex items-center gap-3 border-b border-white/10 px-4 py-4 ${collapsed ? "justify-center px-0" : ""}`}>
+        {/* header (logo leva à página inicial) */}
+        <button
+          onClick={() => {
+            navigate("");
+            onClose();
+          }}
+          title="Página inicial"
+          className={`flex items-center gap-3 border-b border-white/10 px-4 py-4 text-left transition hover:bg-white/5 ${collapsed ? "justify-center px-0" : ""}`}
+        >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/assets/images/logosufotur.png" alt="SUFOTUR" className="h-7 w-7 object-contain" />
@@ -67,7 +76,7 @@ export function Sidebar({
               <p className="text-[11px] text-white/60">São João 2026</p>
             </div>
           )}
-        </div>
+        </button>
 
         {/* nav */}
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
@@ -94,6 +103,12 @@ export function Sidebar({
 
         {!collapsed && (
           <div className="border-t border-white/10 px-5 py-4 text-[11px] text-white/45">
+            {updatedAt && (
+              <p className="mb-2 flex items-center gap-1.5 text-white/55">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#8BC53F]" />
+                Atualizado em {formatUpdatedAt(updatedAt)}
+              </p>
+            )}
             <p>Superintendência de</p>
             <p>Fomento ao Turismo</p>
             <p className="mt-2 text-white/30">Governo da Bahia</p>
@@ -102,6 +117,12 @@ export function Sidebar({
       </aside>
     </>
   );
+}
+
+function formatUpdatedAt(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
 }
 
 function IconGrid() {
