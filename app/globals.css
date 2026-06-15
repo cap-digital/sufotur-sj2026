@@ -59,3 +59,136 @@ body {
     animation: fadeIn 0.25s ease-out;
   }
 }
+
+/* ===========================================================
+   Tema São João — tecido na identidade da UI
+   - Faixa coesa no topo: cores da Bahia + varal de bandeirinhas
+   - Motivo de bandeirinha (ponta de pennant) nas barras de acento
+   Tudo puramente visual; a faixa do topo não captura cliques.
+   =========================================================== */
+
+/* --- Faixa do topo (cabeçalho temático global) --- */
+.sj-decor {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  height: 150px;
+  z-index: 50;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* brilho de fogos: luz festiva difusa atrás do varal (integrada, sem adesivos) */
+.sj-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70px 70px at 14% 6%, rgba(242, 194, 48, 0.55), transparent 70%),
+    radial-gradient(80px 80px at 40% 2%, rgba(230, 48, 138, 0.5), transparent 70%),
+    radial-gradient(70px 70px at 62% 8%, rgba(63, 169, 201, 0.55), transparent 70%),
+    radial-gradient(80px 80px at 86% 4%, rgba(139, 197, 63, 0.5), transparent 70%);
+  filter: blur(8px);
+  opacity: 0.22;
+  animation: sjGlow 5.5s ease-in-out infinite;
+}
+@keyframes sjGlow {
+  0%,
+  100% {
+    opacity: 0.12;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.04);
+  }
+}
+
+/* fina faixa de cores da Bahia, ancorando a marca no topo */
+.sj-bahia-stripe {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    #8bc53f 0 16.66%,
+    #3fa9c9 16.66% 33.33%,
+    #e8862b 33.33% 50%,
+    #e6308a 50% 66.66%,
+    #e12b2b 66.66% 83.33%,
+    #f2c230 83.33% 100%
+  );
+}
+
+/* varal de bandeirinhas logo abaixo da faixa */
+.sj-bunting {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-inline: 4px;
+  border-top: 2px solid rgba(0, 0, 0, 0.18); /* fio do varal */
+}
+.sj-flag {
+  flex: 1 1 0;
+  height: 20px;
+  margin-inline: 1px;
+  transform-origin: 50% 0;
+  animation: sjSway 2.8s ease-in-out infinite alternate;
+  box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.12);
+  opacity: 0.9;
+}
+.sj-flag--tri {
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+.sj-flag--swallow {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 65%, 0 100%);
+}
+/* bandeirinha xadrez / quadriculada (camisa junina) */
+.sj-flag--check {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 70%, 0 100%);
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.6) 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0 4px, transparent 4px 8px),
+    currentColor;
+}
+
+@keyframes sjSway {
+  from {
+    transform: rotate(-3.5deg);
+  }
+  to {
+    transform: rotate(3.5deg);
+  }
+}
+
+/* --- Motivo de bandeirinha nas barras de acento dos cards/títulos ---
+   Reaproveita as barrinhas que já existem na UI: a ponta inferior
+   vira um pennant triangular, costurando o tema sem elementos soltos. */
+.sj-flagbar {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5px), 50% 100%, 0 calc(100% - 5px));
+}
+
+/* balanço suave da bandeirinha ao passar o mouse no card/título */
+.sj-pennant {
+  transform-origin: 50% 0;
+  transition: transform 0.35s ease;
+}
+.sj-host:hover .sj-pennant {
+  animation: sjBarSway 1.4s ease-in-out infinite;
+}
+@keyframes sjBarSway {
+  0%,
+  100% {
+    transform: rotate(-7deg);
+  }
+  50% {
+    transform: rotate(7deg);
+  }
+}
+
+/* Acessibilidade: respeita quem prefere menos movimento */
+@media (prefers-reduced-motion: reduce) {
+  .sj-flag,
+  .sj-glow,
+  .sj-host:hover .sj-pennant {
+    animation: none;
+  }
+}

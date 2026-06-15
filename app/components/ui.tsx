@@ -27,11 +27,11 @@ export function Card({
   accent?: string;
 }) {
   return (
-    <div className={`rounded-xl border border-[var(--border)] bg-white shadow-sm transition-shadow hover:shadow-md ${className}`}>
+    <div className={`sj-host relative rounded-xl border border-[var(--border)] bg-white shadow-sm transition-shadow hover:shadow-md ${className}`}>
       {(title || action) && (
         <div className="flex items-start justify-between gap-3 px-4 pt-4 sm:px-5">
           <div className="flex items-start gap-2.5">
-            {accent && <span className="mt-1 h-3.5 w-1.5 shrink-0 rounded-full" style={{ background: accent }} aria-hidden />}
+            {accent && <span className="sj-flagbar sj-pennant mt-1 h-4 w-1.5 shrink-0 rounded-t-full" style={{ background: accent }} aria-hidden />}
             <div>
               {title && <h3 className="text-sm font-semibold text-[var(--ink)]">{title}</h3>}
               {subtitle && <p className="mt-0.5 text-xs text-[var(--muted)]">{subtitle}</p>}
@@ -66,7 +66,7 @@ export function KpiCard({
   return (
     <div className="relative overflow-hidden rounded-xl border border-[var(--border)] bg-white p-4 shadow-sm">
       <span
-        className="absolute left-0 top-0 h-full w-1"
+        className="sj-flagbar absolute left-0 top-0 h-full w-1"
         style={{ background: accent }}
         aria-hidden
       />
@@ -110,7 +110,7 @@ export function StatCard({
   const showSpark = spark && spark.length > 1;
   return (
     <div className="group relative overflow-hidden rounded-xl border border-[var(--border)] bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
-      <span className="absolute left-0 top-0 h-full w-1" style={{ background: accent }} aria-hidden />
+      <span className="sj-flagbar absolute left-0 top-0 h-full w-1" style={{ background: accent }} aria-hidden />
       <div className="flex items-center justify-between">
         <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">{label}</p>
         <MetricIcon label={label} accent={accent} />
@@ -217,8 +217,8 @@ export function Select<T extends string>({
 
 export function SectionTitle({ children, sub, accent = "#3FA9C9" }: { children: React.ReactNode; sub?: string; accent?: string }) {
   return (
-    <div className="mb-5 flex items-start gap-3">
-      <span className="mt-1 h-8 w-1.5 shrink-0 rounded-full" style={{ background: accent }} aria-hidden />
+    <div className="sj-host mb-5 flex items-start gap-3">
+      <span className="sj-flagbar sj-pennant mt-1 h-8 w-1.5 shrink-0 rounded-t-full" style={{ background: accent }} aria-hidden />
       <div>
         <h2 className="text-xl font-bold leading-tight text-[var(--ink)] sm:text-2xl">{children}</h2>
         {sub && <p className="mt-0.5 text-sm text-[var(--muted)]">{sub}</p>}
@@ -289,7 +289,7 @@ export function BigStat({
 }) {
   return (
     <div className="relative overflow-hidden rounded-xl border border-[var(--border)] bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
-      <span className="absolute left-0 top-0 h-full w-1" style={{ background: accent }} aria-hidden />
+      <span className="sj-flagbar absolute left-0 top-0 h-full w-1" style={{ background: accent }} aria-hidden />
       <div className="flex items-center justify-between">
         <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">{label}</p>
         <MetricIcon label={label} accent={accent} />
