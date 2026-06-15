@@ -258,6 +258,11 @@ export function resolveThumb(url: string): string | null {
   // Google Drive
   const drive = url.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
   if (drive) return `https://drive.google.com/thumbnail?id=${drive[1]}&sz=w600`;
+  // Kwai não tem thumbnail derivável da URL; a imagem está na og:image da
+  // página, resolvida no servidor por /api/kwai-thumb.
+  if (/(?:^|\.)kwai(?:-video)?\.com\//.test(url)) {
+    return `/api/kwai-thumb?u=${encodeURIComponent(url)}`;
+  }
   // Imagem direta
   if (/^https?:\/\//.test(url)) return url;
   return null;

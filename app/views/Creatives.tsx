@@ -129,10 +129,10 @@ export function Creatives({ rows }: { rows: Row[] }) {
       <AnalysisBox title="Destaques por custo e taxa" accent="#8BC53F" className="mt-4">
         <p className="text-xs text-[var(--muted)]">Entre criativos com volume relevante (≥ 1.000 impressões).</p>
         <div className="grid grid-cols-1 gap-x-6 gap-y-2.5 sm:grid-cols-2">
-          {best.byCPM && <Insight label={<>Menor CPM <span className="text-[var(--muted)]">· {trunc(best.byCPM.c.criativo)}</span></>} value={formatCurrency(best.byCPM.v)} color="#16a34a" />}
-          {best.byCTR && best.byCTR.totals.ctr > 0 && <Insight label={<>Maior CTR <span className="text-[var(--muted)]">· {trunc(best.byCTR.criativo)}</span></>} value={formatPercent(best.byCTR.totals.ctr)} color="#16a34a" />}
-          {best.byCPC && <Insight label={<>Menor CPC <span className="text-[var(--muted)]">· {trunc(best.byCPC.c.criativo)}</span></>} value={formatCurrency(best.byCPC.v)} color="#16a34a" />}
-          {best.byCPV && <Insight label={<>Menor CPV <span className="text-[var(--muted)]">· {trunc(best.byCPV.c.criativo)}</span></>} value={formatCurrency(best.byCPV.v)} color="#16a34a" />}
+          {best.byCPM && <Insight label={bestLabel("Menor CPM", best.byCPM.c, platform)} value={formatCurrency(best.byCPM.v)} color="#16a34a" />}
+          {best.byCTR && best.byCTR.totals.ctr > 0 && <Insight label={bestLabel("Maior CTR", best.byCTR, platform)} value={formatPercent(best.byCTR.totals.ctr)} color="#16a34a" />}
+          {best.byCPC && <Insight label={bestLabel("Menor CPC", best.byCPC.c, platform)} value={formatCurrency(best.byCPC.v)} color="#16a34a" />}
+          {best.byCPV && <Insight label={bestLabel("Menor CPV", best.byCPV.c, platform)} value={formatCurrency(best.byCPV.v)} color="#16a34a" />}
         </div>
         {!best.byCPM && !best.byCTR && <p className="text-sm text-[var(--muted)]">Volume insuficiente para ranquear eficiência ainda.</p>}
       </AnalysisBox>
@@ -218,6 +218,26 @@ function Thumb({ url, platform, formatos, color, name }: { url: string; platform
 
 function trunc(s: string, n = 22) {
   return s.length > n ? s.slice(0, n - 1) + "…" : s;
+}
+
+/** Rótulo de um destaque: prefixo + nome do criativo (+ plataforma quando "Todas") */
+function bestLabel(prefix: string, agg: CreativeAgg, platform: Platform | "all") {
+  return (
+    <>
+      {prefix} <span className="text-[var(--muted)]">· {trunc(agg.criativo)}</span>
+      {platform === "all" && <PlatTag p={agg.plataforma} />}
+    </>
+  );
+}
+
+/** Tag de plataforma (ponto colorido + nome) para os destaques quando "Todas" */
+function PlatTag({ p }: { p: Platform }) {
+  return (
+    <span className="ml-1.5 inline-flex items-center gap-1 align-middle text-[11px] font-semibold" style={{ color: PLATFORM_COLORS[p] }}>
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: PLATFORM_COLORS[p] }} />
+      {p === "Youtube" ? "YouTube" : p}
+    </span>
+  );
 }
 function dash(v: number, f: (n: number) => string) {
   return v ? f(v) : "-";
