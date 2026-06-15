@@ -18,7 +18,14 @@ body {
 
 body {
   color: var(--ink);
-  background: var(--bg);
+  /* mesmo fundo festivo da tela inicial — gradiente claro + brilhos coloridos */
+  background-color: #fdeef3;
+  background-image:
+    radial-gradient(40rem 40rem at 0% 0%, rgba(242, 194, 48, 0.18), transparent 60%),
+    radial-gradient(45rem 45rem at 100% 100%, rgba(63, 169, 201, 0.16), transparent 60%),
+    radial-gradient(35rem 35rem at 70% 25%, rgba(230, 48, 138, 0.1), transparent 60%),
+    linear-gradient(to bottom right, #fff7e8, #fdeef3, #e8f5fb);
+  background-attachment: fixed;
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
 }

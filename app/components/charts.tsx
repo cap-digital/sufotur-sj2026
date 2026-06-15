@@ -59,7 +59,7 @@ function ChartTooltip({ kind }: { kind: Fmt }) {
   function Content({ active, payload, label }: TipProps) {
     if (!active || !payload?.length) return null;
     return (
-      <div className="rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs shadow-md">
+      <div className="rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-xs shadow-lg ring-1 ring-black/5">
         {label !== undefined && <p className="mb-1 font-semibold text-[var(--ink)]">{label}</p>}
         {payload.map((p, i) => (
           <p key={i} className="flex items-center gap-2 text-[var(--muted)]">
@@ -103,7 +103,7 @@ export function VerticalBars({
         <XAxis dataKey="name" tick={axisStyle} tickLine={false} axisLine={{ stroke: "#e5e7eb" }} interval={0} />
         <YAxis tick={axisStyle} tickLine={false} axisLine={false} tickFormatter={(v) => fmt(v, "compact")} width={44} />
         <Tooltip content={ChartTooltip({ kind })} cursor={{ fill: "#00000008" }} />
-        <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={64} name="Valor" isAnimationActive={false}>
+        <Bar dataKey="value" radius={[8, 8, 0, 0]} maxBarSize={64} name="Valor" isAnimationActive={false}>
           {data.map((d, i) => (
             <Cell key={i} fill={d.color ?? color} />
           ))}
@@ -138,7 +138,7 @@ export function HorizontalBars({
         <XAxis type="number" tick={axisStyle} tickLine={false} axisLine={false} tickFormatter={(v) => fmt(v, "compact")} />
         <YAxis type="category" dataKey="name" tick={axisStyle} tickLine={false} axisLine={false} width={120} />
         <Tooltip content={ChartTooltip({ kind })} cursor={{ fill: "#00000008" }} />
-        <Bar dataKey="value" radius={[0, 6, 6, 0]} maxBarSize={28} name="Valor" isAnimationActive={false}>
+        <Bar dataKey="value" radius={[0, 8, 8, 0]} maxBarSize={28} name="Valor" isAnimationActive={false}>
           {data.map((d, i) => (
             <Cell key={i} fill={d.color ?? color} />
           ))}
@@ -317,7 +317,7 @@ export function StackedBars({
         <Tooltip content={ChartTooltip({ kind })} cursor={{ fill: "#00000008" }} />
         <Legend iconType="circle" wrapperStyle={{ fontSize: 12, paddingTop: 6 }} />
         {keys.map((k, i) => (
-          <Bar key={k.key} dataKey={k.key} name={k.label} stackId="s" fill={k.color} maxBarSize={48} isAnimationActive={false} radius={i === keys.length - 1 ? (vertical ? [0, 5, 5, 0] : [5, 5, 0, 0]) : undefined}>
+          <Bar key={k.key} dataKey={k.key} name={k.label} stackId="s" fill={k.color} maxBarSize={48} isAnimationActive={false} radius={i === keys.length - 1 ? (vertical ? [0, 7, 7, 0] : [7, 7, 0, 0]) : undefined}>
             <LabelList
               dataKey={k.key}
               position="center"
@@ -352,7 +352,7 @@ export function GroupedBars({
         <Tooltip content={ChartTooltip({ kind })} cursor={{ fill: "#00000008" }} />
         <Legend iconType="circle" wrapperStyle={{ fontSize: 12, paddingTop: 6 }} />
         {keys.map((k) => (
-          <Bar key={k.key} dataKey={k.key} name={k.label} fill={k.color} maxBarSize={40} radius={[5, 5, 0, 0]} isAnimationActive={false}>
+          <Bar key={k.key} dataKey={k.key} name={k.label} fill={k.color} maxBarSize={40} radius={[7, 7, 0, 0]} isAnimationActive={false}>
             <LabelList dataKey={k.key} position="top" formatter={(v: number) => (v ? fmt(v, kind) : "")} style={{ fontSize: 10, fontWeight: 700, fill: "#1a1d21" }} />
           </Bar>
         ))}
@@ -469,7 +469,7 @@ export function Heatmap({
                 return (
                   <td key={c} className="p-0">
                     <div
-                      className="flex h-10 items-center justify-center rounded-md text-[11px] font-bold transition"
+                      className="flex h-10 items-center justify-center rounded-xl text-[11px] font-bold transition"
                       style={{
                         background: v ? withAlpha(color, 0.12 + intensity * 0.88) : "#f3f4f6",
                         color: v ? (dark ? "#fff" : "#1a1d21") : "#cbd0d6",

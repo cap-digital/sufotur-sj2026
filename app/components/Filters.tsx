@@ -69,7 +69,7 @@ export function FilterBar({
   }
 
   return (
-    <div className="mb-5 flex flex-col gap-3 rounded-xl border border-[var(--border)] bg-white p-3 shadow-sm sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2">
+    <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-[var(--border)] bg-white p-3 shadow-sm ring-1 ring-black/5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2">
       {period && (
         <>
           <div className="flex items-center gap-2">
@@ -134,7 +134,7 @@ function DateInput({ label, value, min, max, onChange }: { label: string; value:
         min={min}
         max={max}
         onChange={(e) => e.target.value && onChange(e.target.value)}
-        className="rounded-lg border border-[var(--border)] bg-white px-2 py-1.5 text-xs font-semibold text-[var(--ink)] outline-none focus:border-[#3FA9C9]"
+        className="rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--ink)] outline-none focus:border-[#3FA9C9]"
       />
     </label>
   );

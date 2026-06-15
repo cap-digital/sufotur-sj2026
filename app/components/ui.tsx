@@ -27,7 +27,7 @@ export function Card({
   accent?: string;
 }) {
   return (
-    <div className={`sj-host relative rounded-xl border border-[var(--border)] bg-white shadow-sm transition-shadow hover:shadow-md ${className}`}>
+    <div className={`sj-host relative rounded-2xl border border-[var(--border)] bg-white shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md ${className}`}>
       {(title || action) && (
         <div className="flex items-start justify-between gap-3 px-4 pt-4 sm:px-5">
           <div className="flex items-start gap-2.5">
@@ -64,7 +64,7 @@ export function KpiCard({
 }) {
   const showSpark = spark && spark.length > 1;
   return (
-    <div className="relative overflow-hidden rounded-xl border border-[var(--border)] bg-white p-4 shadow-sm">
+    <div className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm ring-1 ring-black/5">
       <span
         className="sj-flagbar absolute left-0 top-0 h-full w-1"
         style={{ background: accent }}
@@ -109,7 +109,7 @@ export function StatCard({
 }) {
   const showSpark = spark && spark.length > 1;
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-[var(--border)] bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+    <div className="group relative overflow-hidden rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md">
       <span className="sj-flagbar absolute left-0 top-0 h-full w-1" style={{ background: accent }} aria-hidden />
       <div className="flex items-center justify-between">
         <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">{label}</p>
@@ -171,7 +171,7 @@ export function ButtonGroup<T extends string>({
           <button
             key={o.value}
             onClick={() => onChange(o.value)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+            className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
               active
                 ? "text-white shadow-sm"
                 : "bg-white text-[var(--muted)] hover:bg-gray-50 border border-[var(--border)]"
@@ -203,7 +203,7 @@ export function Select<T extends string>({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as T)}
-        className="rounded-lg border border-[var(--border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--ink)] outline-none focus:border-[#3FA9C9]"
+        className="rounded-full border border-[var(--border)] bg-white px-3.5 py-1.5 text-xs font-semibold text-[var(--ink)] outline-none focus:border-[#3FA9C9]"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -241,7 +241,7 @@ export function AnalysisBox({
 }) {
   return (
     <div
-      className={`rounded-xl border border-[var(--border)] bg-white p-4 shadow-sm sm:p-5 ${className}`}
+      className={`rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm ring-1 ring-black/5 sm:p-5 ${className}`}
       style={{ borderLeft: `4px solid ${accent}` }}
     >
       <div className="mb-3 flex items-center gap-2">
@@ -288,7 +288,7 @@ export function BigStat({
   accent?: string;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-xl border border-[var(--border)] bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+    <div className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md sm:p-5">
       <span className="sj-flagbar absolute left-0 top-0 h-full w-1" style={{ background: accent }} aria-hidden />
       <div className="flex items-center justify-between">
         <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">{label}</p>
@@ -325,7 +325,7 @@ export function MetricIcon({ label, accent, size = 18 }: { label: string; accent
 
 export function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex h-40 items-center justify-center rounded-xl border border-dashed border-[var(--border)] bg-white text-sm text-[var(--muted)]">
+    <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-[var(--border)] bg-white text-sm text-[var(--muted)]">
       {message}
     </div>
   );

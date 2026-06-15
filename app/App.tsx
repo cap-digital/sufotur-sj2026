@@ -19,9 +19,12 @@ function parseHash(): string {
   return VALID.includes(h) ? h : h === "" ? "" : "overview";
 }
 
+const AUTH_KEY = "sj_sufotur_auth";
+
 export default function App() {
   const [route, setRoute] = useState<string>("");
   const [mounted, setMounted] = useState(false);
+  const [authed, setAuthed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [rows, setRows] = useState<Row[] | null>(null);
@@ -30,6 +33,7 @@ export default function App() {
 
   useEffect(() => {
     setMounted(true);
+    setAuthed(typeof window !== "undefined" && localStorage.getItem(AUTH_KEY) === "1");
     setRoute(parseHash());
     const onHash = () => setRoute(parseHash());
     window.addEventListener("hashchange", onHash);
@@ -57,15 +61,29 @@ export default function App() {
     window.scrollTo({ top: 0 });
   }
 
+  function handleLogin() {
+    localStorage.setItem(AUTH_KEY, "1");
+    setAuthed(true);
+    navigate("overview");
+  }
+
+  function handleLogout() {
+    localStorage.removeItem(AUTH_KEY);
+    setAuthed(false);
+    setSidebarOpen(false);
+    window.location.hash = "";
+    setRoute("");
+  }
+
   if (!mounted) return null;
 
-  // Landing
-  if (route === "") {
-    return <Landing onEnter={() => navigate("overview")} />;
+  // Gate de acesso: sem login, mostra a tela inicial com formulário
+  if (!authed) {
+    return <Landing onLogin={handleLogin} />;
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[var(--bg)]">
+    <div className="min-h-[100dvh]">
       <Sidebar
         route={route}
         navigate={navigate}
@@ -74,6 +92,7 @@ export default function App() {
         collapsed={collapsed}
         onToggleCollapse={() => setCollapsed((c) => !c)}
         updatedAt={updatedAt}
+        onLogout={handleLogout}
       />
 
       <div className={`transition-all duration-200 ${collapsed ? "lg:pl-24" : "lg:pl-[264px]"}`}>

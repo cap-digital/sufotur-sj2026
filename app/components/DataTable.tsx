@@ -151,7 +151,7 @@ function PagerBtn({
     <button
       onClick={onClick}
       disabled={disabled}
-      className="flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--border)] bg-white text-sm font-bold text-[var(--ink)] disabled:opacity-40 hover:enabled:bg-gray-50"
+      className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--border)] bg-white text-sm font-bold text-[var(--ink)] disabled:opacity-40 hover:enabled:bg-gray-50"
     >
       {children}
     </button>
