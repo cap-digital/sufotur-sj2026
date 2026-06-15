@@ -253,7 +253,7 @@ export function derived(t: Totals): Derived {
 export function resolveThumb(url: string): string | null {
   if (!url) return null;
   // YouTube
-  const yt = url.match(/(?:youtu\.be\/|v=)([\w-]{6,})/);
+  const yt = url.match(/(?:youtu\.be\/|shorts\/|live\/|embed\/|v=)([\w-]{6,})/);
   if (yt) return `https://img.youtube.com/vi/${yt[1]}/hqdefault.jpg`;
   // Google Drive
   const drive = url.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
