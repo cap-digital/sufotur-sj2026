@@ -6,7 +6,7 @@ import { PLATFORM_COLORS, Platform, Row } from "../lib/types";
 import { formatCurrency, formatDecimal, formatInt, formatNumber, formatPercent } from "../lib/format";
 import { applyFilters, DEFAULT_FILTERS, FilterBar, FilterState } from "../components/Filters";
 import { BarDatum, DonutChart, FunnelChart, GroupedBars, HorizontalBars, TimeSeries, VerticalBars } from "../components/charts";
-import { AnalysisBox, ButtonGroup, Card, EmptyState, Insight, SectionTitle, Select, StatCard } from "../components/ui";
+import { AnalysisBox, ButtonGroup, Card, EmptyState, Hero, Insight, SectionTitle, Select, StatCard } from "../components/ui";
 import { Column, DataTable } from "../components/DataTable";
 
 type DemoMetric = "impressoes" | "cliques" | "engajamento";
@@ -131,7 +131,17 @@ export function PlatformView({ rows, platform }: { rows: Row[]; platform: Platfo
         <EmptyState message="Nenhum dado para os filtros selecionados." />
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {/* HERO — visão geral da plataforma */}
+          <Hero
+            kpis={[
+              { label: "Investimento", value: formatCurrency(t.investimento) },
+              { label: "Impressões", value: formatNumber(t.impressoes), sub: formatInt(t.impressoes) },
+              { label: "Cliques", value: formatNumber(t.cliques), sub: formatInt(t.cliques) },
+              { label: "Engajamento", value: formatNumber(t.engajamento), sub: formatInt(t.engajamento) },
+            ]}
+          />
+
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard label="Investimento" value={formatCurrency(t.investimento)} accent={color}
               subs={[{ label: "CPM", value: dv.cpm ? formatCurrency(dv.cpm) : "—" }, { label: "CPC", value: dv.cpc ? formatCurrency(dv.cpc) : "—" }]} />
             <StatCard label="Impressões" value={formatNumber(t.impressoes)} accent={color} spark={dailyValues(data, "impressoes")}

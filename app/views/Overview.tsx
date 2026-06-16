@@ -24,7 +24,7 @@ import {
   HorizontalBars,
   TimeSeries,
 } from "../components/charts";
-import { AnalysisBox, ButtonGroup, Card, Insight, SectionTitle, Select, StatCard } from "../components/ui";
+import { AnalysisBox, ButtonGroup, Card, Hero, Insight, SectionTitle, Select, StatCard } from "../components/ui";
 import { Column, DataTable } from "../components/DataTable";
 
 type AddMetric = "impressoes" | "cliques" | "investimento" | "engajamento" | "visualizacoes" | "alcance";
@@ -121,8 +121,18 @@ export function Overview({ rows }: { rows: Row[] }) {
       <SectionTitle sub="Consolidado das campanhas de mídia — São João 2026">Visão Geral</SectionTitle>
       <FilterBar rows={rows} filters={filters} onChange={setFilters} period={bounds} lockPlatform />
 
+      {/* HERO — visão geral consolidada */}
+      <Hero
+        kpis={[
+          { label: "Investimento", value: formatCurrency(t.investimento) },
+          { label: "Impressões", value: formatNumber(t.impressoes), sub: formatInt(t.impressoes) },
+          { label: "Cliques", value: formatNumber(t.cliques), sub: formatInt(t.cliques) },
+          { label: "Visualizações", value: formatNumber(t.visualizacoes), sub: formatInt(t.visualizacoes) },
+        ]}
+      />
+
       {/* KPIs agrupados — número principal + custos/taxas dentro */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Investimento" value={formatCurrency(t.investimento)} accent="#8BC53F"
           subs={[{ label: "CPM", value: d.cpm ? formatCurrency(d.cpm) : "—" }, { label: "CPC", value: d.cpc ? formatCurrency(d.cpc) : "—" }]} />
         <StatCard label="Impressões" value={formatNumber(t.impressoes)} accent="#3FA9C9" spark={dailyValues(data, "impressoes")}

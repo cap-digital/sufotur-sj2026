@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 import { derived, groupBy, resolveThumb, sumRows, Totals } from "../lib/data";
 import { MetricKey, PLATFORM_COLORS, Platform, Row } from "../lib/types";
 import { formatCurrency, formatInt, formatNumber, formatPercent } from "../lib/format";
-import { ButtonGroup, Card, EmptyState, SectionTitle, Select } from "../components/ui";
+import { ButtonGroup, Card, EmptyState, Hero, MiniKpi, SectionTitle, Select } from "../components/ui";
 import { Column, DataTable } from "../components/DataTable";
 
 interface CreativeAgg {
@@ -197,47 +197,6 @@ export function Creatives({ rows }: { rows: Row[] }) {
       <Card title="Tabela de criativos" subtitle="Plataforma e métricas — ordenável e paginada" className="mt-6 rounded-2xl">
         <DataTable rows={scopeCreatives.filter((c) => c.totals.impressoes > 0)} columns={tableCols} initialSortKey="imp" pageSize={10} />
       </Card>
-    </div>
-  );
-}
-
-/* ---------- HERO ---------- */
-function Hero({ kpis }: { kpis: { label: string; value: string; sub?: string }[] }) {
-  return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2b88a8] via-[#247a98] to-[#1d6580] p-6 text-white shadow-lg ring-1 ring-black/5 sm:p-7">
-      {/* brilhos festivos */}
-      <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full opacity-25 blur-3xl" style={{ background: "radial-gradient(circle,#F2C230,transparent 70%)" }} aria-hidden />
-      <div className="pointer-events-none absolute -bottom-20 left-1/3 h-56 w-56 rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle,#E6308A,transparent 70%)" }} aria-hidden />
-
-      <div className="relative flex items-center gap-2.5">
-        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/15">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-9" /></svg>
-        </span>
-        <h2 className="text-sm font-bold uppercase tracking-wide">Visão Geral — Criativos</h2>
-      </div>
-
-      <div className="relative mt-5 grid grid-cols-2 gap-x-6 gap-y-5 lg:grid-cols-4">
-        {kpis.map((k) => (
-          <div key={k.label}>
-            <span className="mb-1.5 block h-1 w-8 rounded-full bg-white/30" aria-hidden />
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-white/65">{k.label}</p>
-            <p className="mt-1 text-2xl font-extrabold leading-none tabular-nums sm:text-3xl">{k.value}</p>
-            {k.sub && <p className="mt-1 text-[11px] text-white/55 tabular-nums">{k.sub}</p>}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ---------- KPI secundário ---------- */
-function MiniKpi({ label, value, hint, accent }: { label: string; value: string; hint?: string; accent: string }) {
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm ring-1 ring-black/5">
-      <span className="absolute inset-x-0 top-0 h-1" style={{ background: accent }} aria-hidden />
-      <p className="text-xs font-medium text-[var(--muted)]">{label}</p>
-      <p className="mt-1.5 text-2xl font-extrabold tabular-nums text-[var(--ink)]">{value}</p>
-      {hint && <p className="mt-1 text-[11px] text-[var(--muted)]">{hint}</p>}
     </div>
   );
 }

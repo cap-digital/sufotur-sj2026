@@ -302,6 +302,44 @@ export function BigStat({
   );
 }
 
+/** Banner de destaque com os KPIs principais da página (gradiente festivo) */
+export function Hero({
+  kpis,
+}: {
+  kpis: { label: string; value: string; sub?: string }[];
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2b88a8] via-[#247a98] to-[#1d6580] p-6 text-white shadow-lg ring-1 ring-black/5 sm:p-7">
+      {/* brilhos festivos */}
+      <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full opacity-25 blur-3xl" style={{ background: "radial-gradient(circle,#F2C230,transparent 70%)" }} aria-hidden />
+      <div className="pointer-events-none absolute -bottom-20 left-1/3 h-56 w-56 rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle,#E6308A,transparent 70%)" }} aria-hidden />
+
+      <div className="relative grid grid-cols-2 gap-x-6 gap-y-5 lg:grid-cols-4">
+        {kpis.map((k) => (
+          <div key={k.label}>
+            <span className="mb-1.5 block h-1 w-8 rounded-full bg-white/30" aria-hidden />
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-white/65">{k.label}</p>
+            <p className="mt-1 text-2xl font-extrabold leading-none tabular-nums sm:text-3xl">{k.value}</p>
+            {k.sub && <p className="mt-1 text-[11px] text-white/55 tabular-nums">{k.sub}</p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** KPI secundário compacto (faixa de cor no topo) */
+export function MiniKpi({ label, value, hint, accent }: { label: string; value: string; hint?: string; accent: string }) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm ring-1 ring-black/5">
+      <span className="absolute inset-x-0 top-0 h-1" style={{ background: accent }} aria-hidden />
+      <p className="text-xs font-medium text-[var(--muted)]">{label}</p>
+      <p className="mt-1.5 text-2xl font-extrabold tabular-nums text-[var(--ink)]">{value}</p>
+      {hint && <p className="mt-1 text-[11px] text-[var(--muted)]">{hint}</p>}
+    </div>
+  );
+}
+
 /** Ícone tonalizado derivado do rótulo da métrica */
 export function MetricIcon({ label, accent, size = 18 }: { label: string; accent: string; size?: number }) {
   const l = label.toLowerCase();

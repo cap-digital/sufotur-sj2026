@@ -6,7 +6,7 @@ import { GOALS, Goal } from "../lib/goals";
 import { MetricKey, PLATFORM_COLORS, Platform, Row } from "../lib/types";
 import { formatCurrency, formatInt, formatPercent } from "../lib/format";
 import { ProjectionChart, ProjPoint } from "../components/charts";
-import { ButtonGroup, Card, EmptyState, KpiCard, SectionTitle, Select } from "../components/ui";
+import { ButtonGroup, Card, EmptyState, Hero, KpiCard, SectionTitle, Select } from "../components/ui";
 
 const CAMPAIGN_END = "2026-06-30"; // encerramento previsto da campanha
 
@@ -141,8 +141,18 @@ export function Goals({ rows }: { rows: Row[] }) {
         />
       </div>
 
+      {/* HERO — visão geral das metas */}
+      <Hero
+        kpis={[
+          { label: "Investimento contratado", value: formatCurrency(totals.goalInvest), sub: `${computed.length} meta(s)` },
+          { label: "Investimento realizado", value: formatCurrency(totals.realInvest), sub: "travado no contratado" },
+          { label: "Execução do orçamento", value: formatPercent(totals.pct) },
+          { label: "Metas ativas", value: formatInt(computed.length) },
+        ]}
+      />
+
       {/* resumo */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <KpiCard label="Investimento contratado" value={formatCurrency(totals.goalInvest)} accent="#5B6770" hint={`${computed.length} meta(s)`} />
         <KpiCard label="Investimento realizado" value={formatCurrency(totals.realInvest)} accent="#8BC53F" hint="Travado no contratado" />
         <KpiCard label="Execução do orçamento" value={formatPercent(totals.pct)} accent="#3FA9C9" />

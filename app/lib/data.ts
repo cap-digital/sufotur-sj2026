@@ -1,8 +1,11 @@
 import { MetricKey, Platform, Row } from "./types";
 import { toNumber } from "./format";
 
-const ENDPOINT = "https://cqrpbiepyeypbkizwacu.supabase.co/functions/v1/SufoturSJ2026";
-const KEY = "sb_publishable_YN9YKLw6sludrgf9T2i_1g_Dcm8dIiK";
+// Busca via rota interna (mesma origem). O servidor faz o proxy para a Edge
+// Function do Supabase — assim o browser não depende de resolver o host
+// *.supabase.co (que falha em alguns DNS/ISPs, gerando "Failed to fetch") e a
+// chave não vai no bundle. Ver app/api/data/route.ts.
+const ENDPOINT = "/api/data";
 
 const VALID_PLATFORMS: Platform[] = ["Meta", "Kwai"];
 
@@ -58,15 +61,7 @@ function normGender(g: string): string {
 }
 
 export async function fetchData(): Promise<{ rows: Row[]; timestamp: string }> {
-  const res = await fetch(ENDPOINT, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${KEY}`,
-      apikey: KEY,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ name: "Functions" }),
-  });
+  const res = await fetch(ENDPOINT, { cache: "no-store" });
   if (!res.ok) throw new Error(`Erro ${res.status} ao carregar dados`);
   const json = await res.json();
   const list: RawRow[] = json.consolidado ?? [];
