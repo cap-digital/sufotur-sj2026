@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { dailyTotals, dailyValues, dateBounds, derived, groupBy, shortDate, sumRows } from "../lib/data";
+import { dailyTotals, dateBounds, derived, groupBy, shortDate, sumRows } from "../lib/data";
 import { PLATFORM_COLORS, Platform, Row } from "../lib/types";
 import { formatCurrency, formatDecimal, formatInt, formatNumber, formatPercent } from "../lib/format";
 import { applyFilters, DEFAULT_FILTERS, FilterBar, FilterState } from "../components/Filters";
 import { BarDatum, DonutChart, FunnelChart, GroupedBars, HorizontalBars, TimeSeries, VerticalBars } from "../components/charts";
-import { AnalysisBox, ButtonGroup, Card, EmptyState, Hero, Insight, SectionTitle, Select, StatCard } from "../components/ui";
+import { AnalysisBox, ButtonGroup, Card, EmptyState, Hero, Insight, SectionTitle, Select } from "../components/ui";
 import { Column, DataTable } from "../components/DataTable";
 
 type DemoMetric = "impressoes" | "cliques" | "engajamento";
@@ -131,7 +131,7 @@ export function PlatformView({ rows, platform }: { rows: Row[]; platform: Platfo
         <EmptyState message="Nenhum dado para os filtros selecionados." />
       ) : (
         <>
-          {/* HERO — visão geral da plataforma */}
+          {/* HERO — visão geral da plataforma (KPIs + custos/taxas) */}
           <Hero
             kpis={[
               { label: "Investimento", value: formatCurrency(t.investimento) },
@@ -139,18 +139,15 @@ export function PlatformView({ rows, platform }: { rows: Row[]; platform: Platfo
               { label: "Cliques", value: formatNumber(t.cliques), sub: formatInt(t.cliques) },
               { label: "Engajamento", value: formatNumber(t.engajamento), sub: formatInt(t.engajamento) },
             ]}
+            secondary={[
+              { label: "Alcance", value: t.alcance ? formatNumber(t.alcance) : "—" },
+              { label: "Frequência", value: t.alcance ? formatDecimal(t.impressoes / t.alcance) : "—" },
+              { label: "CPM", value: dv.cpm ? formatCurrency(dv.cpm) : "—" },
+              { label: "CPC", value: dv.cpc ? formatCurrency(dv.cpc) : "—" },
+              { label: "CTR", value: formatPercent(t.ctr) },
+              { label: "Taxa eng.", value: formatPercent(dv.engRate) },
+            ]}
           />
-
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="Investimento" value={formatCurrency(t.investimento)} accent={color}
-              subs={[{ label: "CPM", value: dv.cpm ? formatCurrency(dv.cpm) : "—" }, { label: "CPC", value: dv.cpc ? formatCurrency(dv.cpc) : "—" }]} />
-            <StatCard label="Impressões" value={formatNumber(t.impressoes)} accent={color} spark={dailyValues(data, "impressoes")}
-              subs={[{ label: "Alcance", value: t.alcance ? formatNumber(t.alcance) : "—" }, { label: "Frequência", value: t.alcance ? formatDecimal(t.impressoes / t.alcance) : "—" }]} />
-            <StatCard label="Cliques" value={formatNumber(t.cliques)} accent={color} spark={dailyValues(data, "cliques")}
-              subs={[{ label: "CTR", value: formatPercent(t.ctr) }, { label: "CPC", value: dv.cpc ? formatCurrency(dv.cpc) : "—" }]} />
-            <StatCard label="Engajamento" value={formatNumber(t.engajamento)} accent={color} spark={dailyValues(data, "engajamento")}
-              subs={[{ label: "Taxa eng.", value: formatPercent(dv.engRate) }, { label: "CPE", value: dv.cpe ? formatCurrency(dv.cpe) : "—" }]} />
-          </div>
 
           {/* Linha 1 — grande: comparativo de estratégias (não etário) */}
           <Card title="Estratégias em comparação" subtitle="Volume por estratégia — Alcance × Engajamento" className="mt-5">

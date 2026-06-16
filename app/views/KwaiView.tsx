@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { dailyTotals, dailyValues, dateBounds, derived, groupBy, shortDate, sumRows } from "../lib/data";
+import { dailyTotals, dateBounds, derived, groupBy, shortDate, sumRows } from "../lib/data";
 import { Row } from "../lib/types";
 import { formatCurrency, formatDecimal, formatInt, formatNumber, formatPercent } from "../lib/format";
 import { applyFilters, DEFAULT_FILTERS, FilterBar, FilterState } from "../components/Filters";
 import { BarDatum, DonutChart, FunnelChart, HorizontalBars, TimeSeries, VerticalBars } from "../components/charts";
-import { AnalysisBox, Card, EmptyState, Hero, Insight, SectionTitle, Select, StatCard } from "../components/ui";
+import { AnalysisBox, Card, EmptyState, Hero, Insight, SectionTitle, Select } from "../components/ui";
 import { Column, DataTable } from "../components/DataTable";
 
 const KW = "#E8862B";
@@ -109,7 +109,7 @@ export function KwaiView({ rows }: { rows: Row[] }) {
         <EmptyState message="Nenhum dado para os filtros selecionados." />
       ) : (
         <>
-          {/* HERO — visão geral da plataforma */}
+          {/* HERO — visão geral da plataforma (KPIs + custos/taxas) */}
           <Hero
             kpis={[
               { label: "Investimento", value: formatCurrency(t.investimento) },
@@ -117,18 +117,15 @@ export function KwaiView({ rows }: { rows: Row[] }) {
               { label: "Cliques", value: formatNumber(t.cliques), sub: formatInt(t.cliques) },
               { label: "Visualizações", value: formatNumber(t.visualizacoes), sub: formatInt(t.visualizacoes) },
             ]}
+            secondary={[
+              { label: "Frequência", value: t.alcance ? formatDecimal(t.impressoes / t.alcance) : "—" },
+              { label: "CPM", value: dv.cpm ? formatCurrency(dv.cpm) : "—" },
+              { label: "CPC", value: dv.cpc ? formatCurrency(dv.cpc) : "—" },
+              { label: "CPV", value: dv.cpv ? formatCurrency(dv.cpv) : "—" },
+              { label: "CTR", value: formatPercent(t.ctr) },
+              { label: "VTR", value: formatPercent(dv.vtr) },
+            ]}
           />
-
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="Investimento" value={formatCurrency(t.investimento)} accent={KW} spark={dailyValues(data, "investimento")}
-              subs={[{ label: "CPM", value: dv.cpm ? formatCurrency(dv.cpm) : "—" }, { label: "CPC", value: dv.cpc ? formatCurrency(dv.cpc) : "—" }]} />
-            <StatCard label="Impressões" value={formatNumber(t.impressoes)} accent={KW} spark={dailyValues(data, "impressoes")}
-              subs={[{ label: "CPM", value: dv.cpm ? formatCurrency(dv.cpm) : "—" }, { label: "Freq.", value: t.alcance ? formatDecimal(t.impressoes / t.alcance) : "—" }]} />
-            <StatCard label="Cliques" value={formatNumber(t.cliques)} accent={KW} spark={dailyValues(data, "cliques")}
-              subs={[{ label: "CTR", value: formatPercent(t.ctr) }, { label: "CPC", value: dv.cpc ? formatCurrency(dv.cpc) : "—" }]} />
-            <StatCard label="Visualizações" value={formatNumber(t.visualizacoes)} accent={KW} spark={dailyValues(data, "visualizacoes")}
-              subs={[{ label: "VTR", value: formatPercent(dv.vtr) }, { label: "CPV", value: dv.cpv ? formatCurrency(dv.cpv) : "—" }]} />
-          </div>
 
           {/* Linha 1 — grande: evolução diária */}
           <Card title="Evolução diária" subtitle="Impressões, visualizações e cliques por dia" className="mt-5">

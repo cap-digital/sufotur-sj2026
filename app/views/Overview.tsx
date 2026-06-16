@@ -3,7 +3,6 @@
 import React, { useMemo, useState } from "react";
 import {
   dailyTotals,
-  dailyValues,
   dateBounds,
   derived,
   groupBy,
@@ -24,7 +23,7 @@ import {
   HorizontalBars,
   TimeSeries,
 } from "../components/charts";
-import { AnalysisBox, ButtonGroup, Card, Hero, Insight, SectionTitle, Select, StatCard } from "../components/ui";
+import { AnalysisBox, ButtonGroup, Card, Hero, Insight, SectionTitle, Select } from "../components/ui";
 import { Column, DataTable } from "../components/DataTable";
 
 type AddMetric = "impressoes" | "cliques" | "investimento" | "engajamento" | "visualizacoes" | "alcance";
@@ -121,7 +120,7 @@ export function Overview({ rows }: { rows: Row[] }) {
       <SectionTitle sub="Consolidado das campanhas de mídia — São João 2026">Visão Geral</SectionTitle>
       <FilterBar rows={rows} filters={filters} onChange={setFilters} period={bounds} lockPlatform />
 
-      {/* HERO — visão geral consolidada */}
+      {/* HERO — visão geral consolidada (KPIs + custos/taxas) */}
       <Hero
         kpis={[
           { label: "Investimento", value: formatCurrency(t.investimento) },
@@ -129,19 +128,15 @@ export function Overview({ rows }: { rows: Row[] }) {
           { label: "Cliques", value: formatNumber(t.cliques), sub: formatInt(t.cliques) },
           { label: "Visualizações", value: formatNumber(t.visualizacoes), sub: formatInt(t.visualizacoes) },
         ]}
+        secondary={[
+          { label: "Alcance", value: t.alcance ? formatNumber(t.alcance) : "—" },
+          { label: "Frequência", value: t.alcance ? formatDecimal(t.impressoes / t.alcance) : "—" },
+          { label: "CPM", value: d.cpm ? formatCurrency(d.cpm) : "—" },
+          { label: "CPC", value: d.cpc ? formatCurrency(d.cpc) : "—" },
+          { label: "CTR", value: formatPercent(t.ctr) },
+          { label: "VTR", value: formatPercent(d.vtr) },
+        ]}
       />
-
-      {/* KPIs agrupados — número principal + custos/taxas dentro */}
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Investimento" value={formatCurrency(t.investimento)} accent="#8BC53F"
-          subs={[{ label: "CPM", value: d.cpm ? formatCurrency(d.cpm) : "—" }, { label: "CPC", value: d.cpc ? formatCurrency(d.cpc) : "—" }]} />
-        <StatCard label="Impressões" value={formatNumber(t.impressoes)} accent="#3FA9C9" spark={dailyValues(data, "impressoes")}
-          subs={[{ label: "Alcance", value: t.alcance ? formatNumber(t.alcance) : "—" }, { label: "Frequência", value: t.alcance ? formatDecimal(t.impressoes / t.alcance) : "—" }]} />
-        <StatCard label="Cliques" value={formatNumber(t.cliques)} accent="#E8862B" spark={dailyValues(data, "cliques")}
-          subs={[{ label: "CTR", value: formatPercent(t.ctr) }, { label: "CPC", value: d.cpc ? formatCurrency(d.cpc) : "—" }]} />
-        <StatCard label="Visualizações" value={formatNumber(t.visualizacoes)} accent="#E6308A" spark={dailyValues(data, "visualizacoes")}
-          subs={[{ label: "VTR", value: formatPercent(d.vtr) }, { label: "CPV", value: d.cpv ? formatCurrency(d.cpv) : "—" }]} />
-      </div>
 
       {/* Linha 1 — componente grande: linha por dia × plataforma */}
       <Card

@@ -302,11 +302,14 @@ export function BigStat({
   );
 }
 
-/** Banner de destaque com os KPIs principais da página (gradiente festivo) */
+/** Banner de destaque com os KPIs principais da página (gradiente festivo).
+ *  `kpis` = números de destaque; `secondary` = custos/taxas (linha menor abaixo). */
 export function Hero({
   kpis,
+  secondary,
 }: {
   kpis: { label: string; value: string; sub?: string }[];
+  secondary?: { label: string; value: string }[];
 }) {
   return (
     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2b88a8] via-[#247a98] to-[#1d6580] p-6 text-white shadow-lg ring-1 ring-black/5 sm:p-7">
@@ -324,6 +327,17 @@ export function Hero({
           </div>
         ))}
       </div>
+
+      {secondary && secondary.length > 0 && (
+        <div className="relative mt-6 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-white/15 pt-5 sm:grid-cols-3 lg:grid-cols-6">
+          {secondary.map((s) => (
+            <div key={s.label}>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-white/55">{s.label}</p>
+              <p className="mt-0.5 text-base font-bold tabular-nums text-white/95 sm:text-lg">{s.value}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
