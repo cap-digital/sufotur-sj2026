@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { dailyTotals, dateBounds, derived, groupBy, shortDate, sumRows } from "../lib/data";
 import { Row } from "../lib/types";
-import { formatCurrency, formatDecimal, formatInt, formatNumber, formatPercent } from "../lib/format";
+import { formatCurrency, formatInt, formatNumber, formatPercent } from "../lib/format";
 import { applyFilters, DEFAULT_FILTERS, FilterBar, FilterState } from "../components/Filters";
 import { BarDatum, DonutChart, FunnelChart, HorizontalBars, TimeSeries, VerticalBars } from "../components/charts";
 import { AnalysisBox, Card, EmptyState, Hero, Insight, SectionTitle, Select } from "../components/ui";
@@ -111,6 +111,7 @@ export function KwaiView({ rows }: { rows: Row[] }) {
         <>
           {/* HERO — visão geral da plataforma (KPIs + custos/taxas) */}
           <Hero
+            gradient="from-[#f0992f] via-[#e8862b] to-[#c25e16]"
             kpis={[
               { label: "Investimento", value: formatCurrency(t.investimento) },
               { label: "Impressões", value: formatNumber(t.impressoes), sub: formatInt(t.impressoes) },
@@ -118,7 +119,6 @@ export function KwaiView({ rows }: { rows: Row[] }) {
               { label: "Visualizações", value: formatNumber(t.visualizacoes), sub: formatInt(t.visualizacoes) },
             ]}
             secondary={[
-              { label: "Frequência", value: t.alcance ? formatDecimal(t.impressoes / t.alcance) : "—" },
               { label: "CPM", value: dv.cpm ? formatCurrency(dv.cpm) : "—" },
               { label: "CPC", value: dv.cpc ? formatCurrency(dv.cpc) : "—" },
               { label: "CPV", value: dv.cpv ? formatCurrency(dv.cpv) : "—" },

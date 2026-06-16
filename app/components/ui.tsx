@@ -307,12 +307,14 @@ export function BigStat({
 export function Hero({
   kpis,
   secondary,
+  gradient = "from-[#2b88a8] via-[#247a98] to-[#1d6580]",
 }: {
   kpis: { label: string; value: string; sub?: string }[];
   secondary?: { label: string; value: string }[];
+  gradient?: string;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2b88a8] via-[#247a98] to-[#1d6580] p-6 text-white shadow-lg ring-1 ring-black/5 sm:p-7">
+    <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${gradient} p-6 text-white shadow-lg ring-1 ring-black/5 sm:p-7`}>
       {/* brilhos festivos */}
       <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full opacity-25 blur-3xl" style={{ background: "radial-gradient(circle,#F2C230,transparent 70%)" }} aria-hidden />
       <div className="pointer-events-none absolute -bottom-20 left-1/3 h-56 w-56 rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle,#E6308A,transparent 70%)" }} aria-hidden />

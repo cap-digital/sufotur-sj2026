@@ -5,16 +5,12 @@ import { shortDate, sumRows } from "../lib/data";
 import { GOALS, Goal } from "../lib/goals";
 import { MetricKey, PLATFORM_COLORS, Platform, Row } from "../lib/types";
 import { formatCurrency, formatInt, formatPercent } from "../lib/format";
-import { ProjectionChart, ProjPoint } from "../components/charts";
 import { ButtonGroup, Card, EmptyState, Hero, SectionTitle, Select } from "../components/ui";
 
 const CAMPAIGN_END = "2026-06-30"; // encerramento previsto da campanha
 
 function dayOffset(a: string, b: string): number {
   return Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / 86400000);
-}
-function addDays(date: string, k: number): string {
-  return new Date(Date.parse(date + "T00:00:00Z") + k * 86400000).toISOString().slice(0, 10);
 }
 
 function fmtMetric(v: number, key: MetricKey): string {
@@ -26,7 +22,6 @@ function fmtMetric(v: number, key: MetricKey): string {
 export function Goals({ rows }: { rows: Row[] }) {
   const [platform, setPlatform] = useState<Platform | "all">("all");
   const [estrategia, setEstrategia] = useState<string>("all");
-  const [projGoalKey, setProjGoalKey] = useState<string>(`${GOALS[0].plataforma}|${GOALS[0].estrategia}`);
 
   // metas visíveis conforme filtros
   const visibleGoals = useMemo(() => {
@@ -49,7 +44,6 @@ export function Goals({ rows }: { rows: Row[] }) {
       const t = sumRows(matched);
       const realizedInvest = t.investimento;
       const realizedMetric = t[g.metricKey];
-      // Investimento: travado em 100% (nem % nem valor passam do contratado)
       const cappedInvest = Math.min(realizedInvest, g.investimento);
       const investPct = g.investimento > 0 ? Math.min((realizedInvest / g.investimento) * 100, 100) : 0;
       const metricPct = g.metricGoal > 0 ? (realizedMetric / g.metricGoal) * 100 : 0;
@@ -57,58 +51,40 @@ export function Goals({ rows }: { rows: Row[] }) {
     });
   }, [visibleGoals, rows]);
 
-  // totais (investimento travado)
   const totals = useMemo(() => {
     const goalInvest = computed.reduce((s, c) => s + c.g.investimento, 0);
     const realInvest = computed.reduce((s, c) => s + c.cappedInvest, 0);
     return { goalInvest, realInvest, pct: goalInvest > 0 ? (realInvest / goalInvest) * 100 : 0 };
   }, [computed]);
 
-  // ----- Projeção: investimento + entrega da estratégia escolhida nos botões -----
-  const selectedGoal = useMemo(
-    () => GOALS.find((g) => `${g.plataforma}|${g.estrategia}` === projGoalKey) ?? GOALS[0],
-    [projGoalKey]
-  );
-
-  const projection = useMemo<{ data: ProjPoint[]; willHit: boolean } | null>(() => {
-    const g = selectedGoal;
-    const gRows = rows.filter((r) => r.plataforma === g.plataforma && r.estrategia === g.estrategia && r.data);
-    const dates = Array.from(new Set(gRows.map((r) => r.data.slice(0, 10)))).sort();
-    if (dates.length === 0) return null;
-
-    const series = dates.map((date) => {
-      const tt = sumRows(gRows.filter((r) => r.data.slice(0, 10) <= date));
-      return {
-        date,
-        invest: g.investimento > 0 ? Math.min(100, (tt.investimento / g.investimento) * 100) : 0,
-        metric: g.metricGoal > 0 ? (tt[g.metricKey] / g.metricGoal) * 100 : 0,
-      };
+  // ----- Projeção de execução: previsão de entrega ao fim da campanha -----
+  // Para cada meta visível: ritmo médio diário observado e onde a entrega deve
+  // chegar até CAMPAIGN_END mantendo esse ritmo (projeção linear).
+  const projections = useMemo<ProjItem[]>(() => {
+    return computed.map((c) => {
+      const g = c.g;
+      const dates = Array.from(
+        new Set(rows.filter((r) => r.plataforma === g.plataforma && r.estrategia === g.estrategia && r.data).map((r) => r.data.slice(0, 10)))
+      ).sort();
+      if (dates.length === 0) return { c, hasData: false };
+      const first = dates[0];
+      const last = dates[dates.length - 1];
+      const daysActive = Math.max(1, dayOffset(first, last) + 1);
+      const daysRemaining = Math.max(0, dayOffset(last, CAMPAIGN_END));
+      const realizedPct = c.metricPct;
+      const pacePerDay = realizedPct / daysActive; // pontos de % por dia
+      const projectedPct = realizedPct + pacePerDay * daysRemaining;
+      return { c, hasData: true, realizedPct, projectedPct, pacePerDay, daysRemaining, lastDate: last, willHit: projectedPct >= 100 };
     });
+  }, [computed, rows]);
 
-    const first = series[0];
-    const last = series[series.length - 1];
-    const span = Math.max(1, dayOffset(first.date, last.date));
-    const slopeI = (last.invest - first.invest) / span;
-    const slopeM = (last.metric - first.metric) / span;
+  // escala comum das barras (deixa espaço acima de 100% quando alguém ultrapassa)
+  const projScaleMax = useMemo(() => {
+    const maxProj = Math.max(100, ...projections.filter((p): p is ProjReady => p.hasData).map((p) => p.projectedPct));
+    return Math.min(200, Math.max(120, Math.ceil(maxProj / 10) * 10));
+  }, [projections]);
 
-    const data: ProjPoint[] = series.map((p, i) => ({
-      name: shortDate(p.date),
-      invest: +p.invest.toFixed(2),
-      metric: +p.metric.toFixed(2),
-      investProj: i === series.length - 1 ? +p.invest.toFixed(2) : null,
-      metricProj: i === series.length - 1 ? +p.metric.toFixed(2) : null,
-    }));
-
-    const totalDays = dayOffset(last.date, CAMPAIGN_END);
-    let endInvest = last.invest;
-    let endMetric = last.metric;
-    for (let k = 2; k <= totalDays; k += 2) {
-      endInvest = Math.min(100, last.invest + slopeI * k);
-      endMetric = Math.max(0, last.metric + slopeM * k);
-      data.push({ name: shortDate(addDays(last.date, k)), invest: null, metric: null, investProj: +endInvest.toFixed(2), metricProj: +endMetric.toFixed(2) });
-    }
-    return { data, willHit: endMetric >= 100 };
-  }, [selectedGoal, rows]);
+  const hasProjData = projections.some((p) => p.hasData);
 
   return (
     <div>
@@ -143,9 +119,10 @@ export function Goals({ rows }: { rows: Row[] }) {
 
       {/* HERO — visão geral das metas */}
       <Hero
+        gradient="from-[#9fd24f] via-[#79b22f] to-[#4e8a1e]"
         kpis={[
           { label: "Investimento contratado", value: formatCurrency(totals.goalInvest), sub: `${computed.length} meta(s)` },
-          { label: "Investimento realizado", value: formatCurrency(totals.realInvest), sub: "travado no contratado" },
+          { label: "Investimento realizado", value: formatCurrency(totals.realInvest) },
           { label: "Execução do orçamento", value: formatPercent(totals.pct) },
           { label: "Metas ativas", value: formatInt(computed.length) },
         ]}
@@ -162,48 +139,83 @@ export function Goals({ rows }: { rows: Row[] }) {
         </div>
       )}
 
-      {/* Projeção de execução (embaixo de tudo) */}
+      {/* Projeção de execução — previsão de entrega por estratégia */}
       <Card
         title="Projeção de execução"
-        subtitle={`Investimento e entrega da estratégia escolhida como % da meta — tracejado projeta a tendência até ${shortDate(CAMPAIGN_END)}`}
+        subtitle={`Onde cada estratégia está hoje (barra cheia) e onde deve chegar até ${shortDate(CAMPAIGN_END)} mantendo o ritmo atual (faixa clara). A marca vertical é a meta.`}
         className="mt-4"
         action={
-          projection && (
-            <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${projection.willHit ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
-              {projection.willHit ? "No ritmo de bater a meta" : "Abaixo do ritmo ideal"}
+          hasProjData && (
+            <span className="rounded-full bg-[var(--bg)] px-2.5 py-1 text-xs font-semibold text-[var(--muted)]">
+              {projections.filter((p) => p.hasData && p.willHit).length}/{projections.filter((p) => p.hasData).length} no ritmo da meta
             </span>
           )
         }
       >
-        <div className="mb-4">
-          <ButtonGroup<string>
-            value={projGoalKey}
-            onChange={setProjGoalKey}
-            options={GOALS.map((g) => ({
-              label: `${g.plataforma} · ${g.estrategia}`,
-              value: `${g.plataforma}|${g.estrategia}`,
-              color: PLATFORM_COLORS[g.plataforma],
-            }))}
-          />
-        </div>
-        {projection ? (
-          <>
-            <ProjectionChart
-              data={projection.data}
-              series={[
-                { key: "invest", label: "Investimento", color: "#3FA9C9" },
-                { key: "metric", label: `Entrega · ${selectedGoal.metricLabel}`, color: "#8BC53F" },
-              ]}
-              height={340}
-            />
-            <p className="mt-2 text-xs text-[var(--muted)]">
-              A linha contínua mostra o realizado acumulado de <strong>{selectedGoal.plataforma} · {selectedGoal.estrategia}</strong>; a tracejada projeta o ritmo atual. O investimento é travado em 100%.
-            </p>
-          </>
+        {hasProjData ? (
+          <div className="space-y-5">
+            {projections.map((p) =>
+              p.hasData ? <ProjectionRow key={`${p.c.g.plataforma}-${p.c.g.estrategia}`} p={p} scaleMax={projScaleMax} /> : null
+            )}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 border-t border-[var(--border)] pt-3 text-xs text-[var(--muted)]">
+              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-4 rounded-sm bg-[#8BC53F]" />realizado hoje</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-4 rounded-sm bg-[#8BC53F]/30" />projeção até {shortDate(CAMPAIGN_END)}</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-3 w-0.5 bg-[var(--ink)]/50" />meta (100%)</span>
+              <span>Projeção linear pelo ritmo médio diário observado.</span>
+            </div>
+          </div>
         ) : (
-          <EmptyState message="Sem dados para projetar esta estratégia ainda." />
+          <EmptyState message="Sem dados para projetar ainda." />
         )}
       </Card>
+    </div>
+  );
+}
+
+/* ---------- Projeção: tipos + linha (bullet de previsão) ---------- */
+type ProjReady = {
+  c: { g: Goal; realizedMetric: number; metricPct: number };
+  hasData: true;
+  realizedPct: number;
+  projectedPct: number;
+  pacePerDay: number;
+  daysRemaining: number;
+  lastDate: string;
+  willHit: boolean;
+};
+type ProjItem = ProjReady | { c: { g: Goal }; hasData: false };
+
+function ProjectionRow({ p, scaleMax }: { p: ProjReady; scaleMax: number }) {
+  const color = PLATFORM_COLORS[p.c.g.plataforma];
+  const realizedW = Math.min(100, (p.realizedPct / scaleMax) * 100);
+  const projW = Math.min(100, (p.projectedPct / scaleMax) * 100);
+  const targetLeft = (100 / scaleMax) * 100;
+  const statusColor = p.willHit ? "#16a34a" : "#d97706";
+  return (
+    <div>
+      <div className="mb-1.5 flex items-center justify-between gap-3">
+        <span className="inline-flex min-w-0 items-center gap-2 text-sm font-semibold text-[var(--ink)]">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: color }} />
+          <span className="truncate">{p.c.g.plataforma} · {p.c.g.estrategia}</span>
+        </span>
+        <span className="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold" style={{ background: `${statusColor}1a`, color: statusColor }}>
+          {p.willHit ? "Tende a bater" : "Abaixo do ritmo"} · {formatPercent(p.projectedPct)}
+        </span>
+      </div>
+
+      {/* bullet: faixa de projeção (clara) + realizado (cheio) + marca da meta */}
+      <div className="relative h-4 w-full rounded-full bg-gray-100">
+        <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${projW}%`, background: `${color}40` }} aria-hidden />
+        <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${realizedW}%`, background: color }} aria-hidden />
+        <div className="absolute inset-y-[-3px] w-0.5 rounded bg-[var(--ink)]/55" style={{ left: `${targetLeft}%` }} aria-hidden />
+      </div>
+
+      <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-[var(--muted)]">
+        <span>Realizado <strong className="tabular-nums text-[var(--ink)]">{formatPercent(p.realizedPct)}</strong></span>
+        <span>Ritmo <strong className="tabular-nums text-[var(--ink)]">{formatPercent(p.pacePerDay)}/dia</strong></span>
+        <span>Faltam <strong className="tabular-nums text-[var(--ink)]">{p.daysRemaining}</strong> dia{p.daysRemaining === 1 ? "" : "s"}</span>
+        <span className="text-[var(--muted)]">{p.c.g.metricLabel}</span>
+      </div>
     </div>
   );
 }
@@ -233,7 +245,7 @@ function GoalCard({
         </div>
       </div>
 
-      {/* Investimento (travado em 100%) */}
+      {/* Investimento realizado vs contratado */}
       <Progress
         label="Investimento"
         valueText={`${formatCurrency(c.cappedInvest)} / ${formatCurrency(c.g.investimento)}`}
