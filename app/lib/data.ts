@@ -1,5 +1,6 @@
 import { MetricKey, Platform, Row } from "./types";
 import { toNumber } from "./format";
+import { CAMPAIGN_END } from "./goals";
 
 // Busca via rota interna (mesma origem). O servidor faz o proxy para a Edge
 // Function do Supabase — assim o browser não depende de resolver o host
@@ -66,7 +67,11 @@ export async function fetchData(): Promise<{ rows: Row[]; timestamp: string }> {
   const json = await res.json();
   const list: RawRow[] = json.consolidado ?? [];
   return {
-    rows: list.map(normalize).filter((r): r is Row => r !== null),
+    rows: list
+      .map(normalize)
+      .filter((r): r is Row => r !== null)
+      // campanha encerrada em CAMPAIGN_END: ignora sincronizações posteriores
+      .filter((r) => !r.data || r.data.slice(0, 10) <= CAMPAIGN_END),
     timestamp: typeof json.timestamp === "string" ? json.timestamp : "",
   };
 }

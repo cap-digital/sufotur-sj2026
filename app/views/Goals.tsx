@@ -2,12 +2,10 @@
 
 import React, { useMemo, useState } from "react";
 import { shortDate, sumRows } from "../lib/data";
-import { GOALS, Goal } from "../lib/goals";
+import { GOALS, Goal, CAMPAIGN_END } from "../lib/goals";
 import { MetricKey, PLATFORM_COLORS, Platform, Row } from "../lib/types";
 import { formatCurrency, formatInt, formatPercent } from "../lib/format";
 import { ButtonGroup, Card, EmptyState, Hero, SectionTitle, Select } from "../components/ui";
-
-const CAMPAIGN_END = "2026-06-30"; // encerramento previsto da campanha
 
 function dayOffset(a: string, b: string): number {
   return Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / 86400000);

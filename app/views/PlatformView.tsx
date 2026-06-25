@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { dailyTotals, dateBounds, derived, groupBy, shortDate, sumRows } from "../lib/data";
+import { cappedInvestmentTotal } from "../lib/goals";
 import { PLATFORM_COLORS, Platform, Row } from "../lib/types";
 import { formatCurrency, formatDecimal, formatInt, formatNumber, formatPercent } from "../lib/format";
 import { applyFilters, DEFAULT_FILTERS, FilterBar, FilterState } from "../components/Filters";
@@ -41,6 +42,8 @@ export function PlatformView({ rows, platform }: { rows: Row[]; platform: Platfo
   const data = useMemo(() => applyFilters(platformRows, { ...filters, plataforma: platform }), [platformRows, filters, platform]);
   const t = useMemo(() => sumRows(data), [data]);
   const dv = useMemo(() => derived(t), [t]);
+  // investimento com teto contratado (verba aplicada), respeitando os filtros
+  const cappedInvest = useMemo(() => cappedInvestmentTotal(data), [data]);
 
   const byStrategy = useMemo(
     () => groupBy(data, (r) => r.estrategia).sort((a, b) => b.totals.investimento - a.totals.investimento),
@@ -134,7 +137,7 @@ export function PlatformView({ rows, platform }: { rows: Row[]; platform: Platfo
           {/* HERO — visão geral da plataforma (KPIs + custos/taxas) */}
           <Hero
             kpis={[
-              { label: "Investimento", value: formatCurrency(t.investimento) },
+              { label: "Investimento", value: formatCurrency(cappedInvest) },
               { label: "Impressões", value: formatNumber(t.impressoes), sub: formatInt(t.impressoes) },
               { label: "Cliques", value: formatNumber(t.cliques), sub: formatInt(t.cliques) },
               { label: "Engajamento", value: formatNumber(t.engajamento), sub: formatInt(t.engajamento) },
@@ -167,7 +170,7 @@ export function PlatformView({ rows, platform }: { rows: Row[]; platform: Platfo
           <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
             <Card title="Investimento por estratégia">
               {byStrategy.some((g) => g.totals.investimento > 0) ? (
-                <DonutChart data={byStrategy.filter((g) => g.totals.investimento > 0).map((g) => ({ name: g.key, value: g.totals.investimento }))} kind="currency" />
+                <DonutChart data={byStrategy.map((g) => ({ name: g.key, value: cappedInvestmentTotal(g.rows) })).filter((g) => g.value > 0)} kind="currency" />
               ) : (
                 <EmptyState message="Sem investimento." />
               )}

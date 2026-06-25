@@ -1,4 +1,8 @@
-import { MetricKey, Platform } from "./types";
+import { MetricKey, Platform, Row } from "./types";
+
+// Encerramento da campanha São João 2026 — campanha finalizada nesta data.
+// Linhas posteriores (sincronizações parciais) são descartadas no carregamento.
+export const CAMPAIGN_END = "2026-06-24";
 
 export interface Goal {
   plataforma: Platform;
@@ -38,3 +42,24 @@ export const GOALS: Goal[] = [
 ];
 
 export const TOTAL_INVESTMENT_GOAL = GOALS.reduce((s, g) => s + g.investimento, 0);
+
+/**
+ * Investimento realizado com cada (plataforma × estratégia) contratada limitado
+ * ao valor contratado (verba aplicada). Recebe linhas já filtradas pela página,
+ * então respeita automaticamente os filtros ativos (teto total 250.000; Meta
+ * 175.000 — Alcance 130.000 / Engajamento 45.000; Kwai 75.000). Estratégias sem
+ * contrato passam sem teto.
+ */
+export function cappedInvestmentTotal(rows: Row[]): number {
+  const spent: Record<string, number> = {};
+  for (const r of rows) {
+    const k = `${r.plataforma}__${r.estrategia}`;
+    spent[k] = (spent[k] ?? 0) + r.investimento;
+  }
+  return Object.keys(spent).reduce((total, k) => {
+    const [plat, estr] = k.split("__");
+    const goal = GOALS.find((g) => g.plataforma === plat && g.estrategia === estr);
+    const v = spent[k];
+    return total + (goal ? Math.min(v, goal.investimento) : v);
+  }, 0);
+}

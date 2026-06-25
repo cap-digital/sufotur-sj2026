@@ -13,6 +13,7 @@ import {
   weekdayMatrix,
   WEEKDAYS,
 } from "../lib/data";
+import { cappedInvestmentTotal } from "../lib/goals";
 import { BAHIA_PALETTE, MetricKey, PLATFORM_COLORS, Platform, Row } from "../lib/types";
 import { formatCurrency, formatDecimal, formatInt, formatNumber, formatPercent } from "../lib/format";
 import { applyFilters, DEFAULT_FILTERS, FilterBar, FilterState } from "../components/Filters";
@@ -49,6 +50,8 @@ export function Overview({ rows }: { rows: Row[] }) {
   const data = useMemo(() => applyFilters(rows, filters), [rows, filters]);
   const t = useMemo(() => sumRows(data), [data]);
   const d = useMemo(() => derived(t), [t]);
+  // investimento com teto contratado (verba aplicada), respeitando filtros
+  const cappedInvest = useMemo(() => cappedInvestmentTotal(data), [data]);
 
   const byPlatform = useMemo(
     () => groupBy(data, (r) => r.plataforma).sort((a, b) => b.totals.investimento - a.totals.investimento),
@@ -61,10 +64,10 @@ export function Overview({ rows }: { rows: Row[] }) {
   const stack = useMemo(() => pivotByDay(data, (r) => r.plataforma, stackMetric), [data, stackMetric]);
   const stackKeys = stack.cats.map((c) => ({ key: c, label: c, color: PLATFORM_COLORS[c as Platform] ?? "#888" }));
 
-  // donut investimento
+  // donut investimento (com teto contratado por plataforma)
   const investDonut = byPlatform
-    .filter((g) => g.totals.investimento > 0)
-    .map((g) => ({ name: g.key, value: g.totals.investimento, color: PLATFORM_COLORS[g.key as Platform] }));
+    .map((g) => ({ name: g.key, value: cappedInvestmentTotal(g.rows), color: PLATFORM_COLORS[g.key as Platform] }))
+    .filter((g) => g.value > 0);
 
   // ranking estratégias (dinâmico)
   const rank = byStrategy
@@ -106,7 +109,7 @@ export function Overview({ rows }: { rows: Row[] }) {
         <span className="h-2.5 w-2.5 rounded-full" style={{ background: PLATFORM_COLORS[r.key as Platform] }} />{r.key}
       </span>
     ) },
-    { key: "inv", header: "Investimento", align: "right", sortValue: (r) => r.totals.investimento, render: (r) => formatCurrency(r.totals.investimento) },
+    { key: "inv", header: "Investimento", align: "right", sortValue: (r) => cappedInvestmentTotal(r.rows), render: (r) => formatCurrency(cappedInvestmentTotal(r.rows)) },
     { key: "imp", header: "Impressões", align: "right", sortValue: (r) => r.totals.impressoes, render: (r) => dash(r.totals.impressoes, formatInt) },
     { key: "alc", header: "Alcance", align: "right", sortValue: (r) => r.totals.alcance, render: (r) => dash(r.totals.alcance, formatInt) },
     { key: "clk", header: "Cliques", align: "right", sortValue: (r) => r.totals.cliques, render: (r) => dash(r.totals.cliques, formatInt) },
@@ -123,7 +126,7 @@ export function Overview({ rows }: { rows: Row[] }) {
       {/* HERO — visão geral consolidada (KPIs + custos/taxas) */}
       <Hero
         kpis={[
-          { label: "Investimento", value: formatCurrency(t.investimento) },
+          { label: "Investimento", value: formatCurrency(cappedInvest) },
           { label: "Impressões", value: formatNumber(t.impressoes), sub: formatInt(t.impressoes) },
           { label: "Cliques", value: formatNumber(t.cliques), sub: formatInt(t.cliques) },
           { label: "Visualizações", value: formatNumber(t.visualizacoes), sub: formatInt(t.visualizacoes) },

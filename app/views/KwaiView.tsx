@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { dailyTotals, dateBounds, derived, groupBy, shortDate, sumRows } from "../lib/data";
+import { cappedInvestmentTotal } from "../lib/goals";
 import { Row } from "../lib/types";
 import { formatCurrency, formatInt, formatNumber, formatPercent } from "../lib/format";
 import { applyFilters, DEFAULT_FILTERS, FilterBar, FilterState } from "../components/Filters";
@@ -41,6 +42,8 @@ export function KwaiView({ rows }: { rows: Row[] }) {
   const data = useMemo(() => applyFilters(kwRows, { ...filters, plataforma: "Kwai" }), [kwRows, filters]);
   const t = useMemo(() => sumRows(data), [data]);
   const dv = useMemo(() => derived(t), [t]);
+  // investimento com teto contratado (verba aplicada), respeitando os filtros
+  const cappedInvest = useMemo(() => cappedInvestmentTotal(data), [data]);
 
   // evolução diária
   const daily = useMemo(
@@ -113,7 +116,7 @@ export function KwaiView({ rows }: { rows: Row[] }) {
           <Hero
             gradient="from-[#f0992f] via-[#e8862b] to-[#c25e16]"
             kpis={[
-              { label: "Investimento", value: formatCurrency(t.investimento) },
+              { label: "Investimento", value: formatCurrency(cappedInvest) },
               { label: "Impressões", value: formatNumber(t.impressoes), sub: formatInt(t.impressoes) },
               { label: "Cliques", value: formatNumber(t.cliques), sub: formatInt(t.cliques) },
               { label: "Visualizações", value: formatNumber(t.visualizacoes), sub: formatInt(t.visualizacoes) },

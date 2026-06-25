@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { derived, groupBy, resolveThumb, sumRows, Totals } from "../lib/data";
+import { cappedInvestmentTotal } from "../lib/goals";
 import { MetricKey, PLATFORM_COLORS, Platform, Row } from "../lib/types";
 import { formatCurrency, formatInt, formatNumber, formatPercent } from "../lib/format";
 import { ButtonGroup, Card, EmptyState, Hero, MiniKpi, SectionTitle, Select } from "../components/ui";
@@ -59,6 +60,8 @@ export function Creatives({ rows }: { rows: Row[] }) {
   const scopeCreatives = useMemo(() => aggregate(scopeRows), [scopeRows]);
   const t = useMemo(() => sumRows(scopeRows), [scopeRows]);
   const dv = useMemo(() => derived(t), [t]);
+  // investimento com teto contratado (verba aplicada), respeitando o filtro de plataforma
+  const cappedInvest = useMemo(() => cappedInvestmentTotal(scopeRows), [scopeRows]);
   const campaigns = useMemo(() => new Set(scopeRows.map((r) => r.campanha).filter(Boolean)).size, [scopeRows]);
 
   // cards: prioridade filtro de botão > exclui métrica base = 0 > ordena
@@ -115,7 +118,7 @@ export function Creatives({ rows }: { rows: Row[] }) {
       {/* HERO — visão geral dos criativos */}
       <Hero
         kpis={[
-          { label: "Investimento", value: formatCurrency(t.investimento) },
+          { label: "Investimento", value: formatCurrency(cappedInvest) },
           { label: "Impressões", value: formatNumber(t.impressoes), sub: formatInt(t.impressoes) },
           { label: "Cliques", value: formatNumber(t.cliques), sub: formatInt(t.cliques) },
           { label: "Engajamento", value: formatNumber(t.engajamento), sub: formatInt(t.engajamento) },
